@@ -210,9 +210,7 @@ void eventloop(XInfo& xinfo) {
     blockDir1.x = 1;
     blockDir1.y = 0;
     int Interval3 = 850/3;
-    dList.push_back(new Rectangular(blockPos1.x, blockPos1.y, blockWidth1, blockWidth1));
-    dList.push_back(new Rectangular(blockPos1.x + Interval3, blockPos1.y, blockWidth1, blockWidth1));
-    dList.push_back(new Rectangular(blockPos1.x + 2*Interval3, blockPos1.y, blockWidth1, blockWidth1));
+    
     
     XPoint blockPos2;
     blockPos2.x = 0;
@@ -223,10 +221,7 @@ void eventloop(XInfo& xinfo) {
     blockDir2.x = -1;
     blockDir2.y = 0;
     int Interval4 = 850/4;
-    dList.push_back(new Rectangular(blockPos2.x, blockPos2.y, blockWidth2, blockHeight2));
-    dList.push_back(new Rectangular(blockPos2.x + Interval4, blockPos2.y, blockWidth2, blockHeight2));
-    dList.push_back(new Rectangular(blockPos2.x + 2*Interval4, blockPos2.y, blockWidth2, blockHeight2));
-    dList.push_back(new Rectangular(blockPos2.x + 3*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+    
 
     XPoint blockPos3;
     blockPos3.x = 0;
@@ -237,8 +232,7 @@ void eventloop(XInfo& xinfo) {
     blockDir3.x = 1;
     blockDir3.y = 0;
     int Interval2 = 850/2;
-    dList.push_back(new Rectangular(blockPos3.x, blockPos3.y, blockWidth3, blockHeight3));
-    dList.push_back(new Rectangular(blockPos3.x + Interval2, blockPos3.y, blockWidth3, blockHeight3));
+    
 
     //dList.push_back(new Text(725, 25, "Level: 1"));
 
@@ -317,11 +311,11 @@ void eventloop(XInfo& xinfo) {
                         if ((frogPos.y + frogSize < w.height) && (frogPos.y > 0))
                             frogPos.y += frogDir.y;
                         // draw frog
-                        rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        rec->paint(xinfo);
+                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
+                        //rec->paint(xinfo);
 
-                        txt = new Text(725, 25, levelArray[level]);
-                        txt->paint(xinfo);
+                        //txt = new Text(725, 25, levelArray[level]);
+                        //txt->paint(xinfo);
                         repaint(dList, xinfo);
                         break;
                     case XK_Left:
@@ -330,11 +324,11 @@ void eventloop(XInfo& xinfo) {
                         if (frogPos.x - frogSize/2 > 0)
                             frogPos.x -= frogDir.x;
                         // draw frog
-                        rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        rec->paint(xinfo);
+                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
+                        //rec->paint(xinfo);
 
-                        txt = new Text(725, 25, levelArray[level]);
-                        txt->paint(xinfo);
+                        //txt = new Text(725, 25, levelArray[level]);
+                        //txt->paint(xinfo);
                         repaint(dList, xinfo);
                         break;
                     case XK_Right:
@@ -343,11 +337,11 @@ void eventloop(XInfo& xinfo) {
                         if (frogPos.x + frogSize < w.width)
                             frogPos.x += frogDir.x;
                         // draw frog
-                        rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        rec->paint(xinfo);
+                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
+                        //rec->paint(xinfo);
 
-                        txt = new Text(725, 25, levelArray[level]);
-                        txt->paint(xinfo);
+                        //txt = new Text(725, 25, levelArray[level]);
+                        //txt->paint(xinfo);
                         repaint(dList, xinfo);
                         break;
                     }
@@ -363,6 +357,24 @@ void eventloop(XInfo& xinfo) {
             // clear background
             XClearWindow(xinfo.display, xinfo.window);
 
+            dList.clear();
+            // Level info
+            dList.push_back(new Text(725, 25, levelArray[level]));
+            // frog
+            dList.push_back(new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize));
+            // blocks in second row
+            dList.push_back(new Rectangular(blockPos1.x, blockPos1.y, blockWidth1, blockWidth1));
+            dList.push_back(new Rectangular(blockPos1.x + Interval3, blockPos1.y, blockWidth1, blockWidth1));
+            dList.push_back(new Rectangular(blockPos1.x + 2*Interval3, blockPos1.y, blockWidth1, blockWidth1));
+            // blocks in third row
+            dList.push_back(new Rectangular(blockPos2.x, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x + Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x + 2*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x + 3*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            // blocks in forth row
+            dList.push_back(new Rectangular(blockPos3.x, blockPos3.y, blockWidth3, blockHeight3));
+            dList.push_back(new Rectangular(blockPos3.x + Interval2, blockPos3.y, blockWidth3, blockHeight3));
+            
             repaint(dList, xinfo);
             blockPos1.x += blockDir1.x;
             blockPos2.x += blockDir2.x;
