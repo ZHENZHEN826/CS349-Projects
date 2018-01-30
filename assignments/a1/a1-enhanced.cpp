@@ -1,3 +1,8 @@
+/*
+a1-enhanced: Set different colours for each line of the blocks
+
+*/
+
 #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
@@ -9,6 +14,10 @@
 #include <sys/time.h>
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
+#include <X11/keysym.h>
+#include <X11/Xresource.h>
+#include <X11/Xos.h>
+#include <X11/Xatom.h>
 
 using namespace std;
 
@@ -21,6 +30,9 @@ const char *levelArray[20] ={"Level 1", "Level 2", "Level 3", "Level 4", "Level 
                              "Level 6", "Level 7", "Level 8", "Level 9", "Level 10",
                              "Level 11", "Level 12", "Level 13", "Level 14", "Level 15"
                              "Level 16", "Level 17", "Level 18", "Level 19", "Level 20"};
+
+enum color { RED, GREEN, BLUE, BLACK};
+typedef enum color color_t;
 
 // get microseconds
 unsigned long now() {
@@ -89,8 +101,33 @@ public:
      // create a simple graphics context
     GC gc = XCreateGC(xinfo.display, xinfo.window, 0, 0);
     int screen = xinfo.screen; //bug?
-    XSetForeground(xinfo.display, gc, BlackPixel(xinfo.display, screen));
     XSetBackground(xinfo.display, gc, WhitePixel(xinfo.display, screen));
+
+    /*  Enhanced code here!
+     *  Set red, blue, green for different line of blocks.
+     *  Reference: http://slist.lilotux.net/linux/xlib/color-drawing.c
+     */ 
+    XColor red, blue, green;
+    Status rc;                // return status of different Xlib functions. 
+    Colormap screen_colormap; // color map used to allocate colors.
+    // Access to screen's color map.
+    screen_colormap = DefaultColormap(xinfo.display, DefaultScreen(xinfo.display));
+    // Allocate three colors:
+    rc = XAllocNamedColor(xinfo.display, screen_colormap, "red", &red, &red);
+    rc = XAllocNamedColor(xinfo.display, screen_colormap, "blue", &blue, &blue);
+    rc = XAllocNamedColor(xinfo.display, screen_colormap, "green", &green, &green);
+    
+    if (blockColor == RED){
+        XSetForeground(xinfo.display, gc, red.pixel);
+    }else if (blockColor == GREEN){
+        XSetForeground(xinfo.display, gc, green.pixel);
+    }else if (blockColor == BLUE) {
+        XSetForeground(xinfo.display, gc, blue.pixel);
+    } else {
+        XSetForeground(xinfo.display, gc, BlackPixel(xinfo.display, screen));
+    }
+
+
     XSetFillStyle(xinfo.display,  gc, FillSolid);
     XSetLineAttributes(xinfo.display, gc,
                        3,       // 3 is line width
@@ -100,13 +137,14 @@ public:
   }
 
   // constructor
-  Rectangular(int x, int y, int width, int height): x(x), y(y), width(width), height(height) {}
+  Rectangular(int x, int y, int width, int height, color_t blockColor): x(x), y(y), width(width), height(height), blockColor(blockColor) {}
 
 private:
   int x;
   int y;
   int width;
   int height;
+  color_t blockColor;
 };
 
 
@@ -177,7 +215,7 @@ void initX(int argc, char* argv[], XInfo& xinfo) {
 
     XFlush(xinfo.display);
 
-    sleep(1);  // give server time to setup
+    //sleep(1);  // give server time to setup
 }
 
 /*
@@ -344,22 +382,22 @@ void eventloop(XInfo& xinfo) {
             // Level info
             dList.push_back(new Text(725, 25, levelArray[level]));
             // frog
-            dList.push_back(new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize));
+            dList.push_back(new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize, BLACK));
             // blocks in second row
-            dList.push_back(new Rectangular(blockPos1.x, blockPos1.y, blockWidth1, blockWidth1));
-            dList.push_back(new Rectangular(blockPos1.x + Interval3, blockPos1.y, blockWidth1, blockWidth1));
-            dList.push_back(new Rectangular(blockPos1.x + 2*Interval3, blockPos1.y, blockWidth1, blockWidth1));
-            dList.push_back(new Rectangular(blockPos1.x + 3*Interval3, blockPos1.y, blockWidth1, blockWidth1));
+            dList.push_back(new Rectangular(blockPos1.x, blockPos1.y, blockWidth1, blockWidth1, RED));
+            dList.push_back(new Rectangular(blockPos1.x + Interval3, blockPos1.y, blockWidth1, blockWidth1, RED));
+            dList.push_back(new Rectangular(blockPos1.x + 2*Interval3, blockPos1.y, blockWidth1, blockWidth1, RED));
+            dList.push_back(new Rectangular(blockPos1.x + 3*Interval3, blockPos1.y, blockWidth1, blockWidth1, RED));
             // blocks in third row
-            dList.push_back(new Rectangular(blockPos2.x, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x - Interval4, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x - 2*Interval4, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x - 3*Interval4, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x - 4*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x, blockPos2.y, blockWidth2, blockHeight2, GREEN));
+            dList.push_back(new Rectangular(blockPos2.x - Interval4, blockPos2.y, blockWidth2, blockHeight2, GREEN));
+            dList.push_back(new Rectangular(blockPos2.x - 2*Interval4, blockPos2.y, blockWidth2, blockHeight2, GREEN));
+            dList.push_back(new Rectangular(blockPos2.x - 3*Interval4, blockPos2.y, blockWidth2, blockHeight2, GREEN));
+            dList.push_back(new Rectangular(blockPos2.x - 4*Interval4, blockPos2.y, blockWidth2, blockHeight2, GREEN));
             // blocks in forth row
-            dList.push_back(new Rectangular(blockPos3.x, blockPos3.y, blockWidth3, blockHeight3));
-            dList.push_back(new Rectangular(blockPos3.x + Interval2, blockPos3.y, blockWidth3, blockHeight3));
-            dList.push_back(new Rectangular(blockPos3.x + 2*Interval2, blockPos3.y, blockWidth3, blockHeight3));
+            dList.push_back(new Rectangular(blockPos3.x, blockPos3.y, blockWidth3, blockHeight3, BLUE));
+            dList.push_back(new Rectangular(blockPos3.x + Interval2, blockPos3.y, blockWidth3, blockHeight3, BLUE));
+            dList.push_back(new Rectangular(blockPos3.x + 2*Interval2, blockPos3.y, blockWidth3, blockHeight3, BLUE));
             
             repaint(dList, xinfo);
 
