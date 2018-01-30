@@ -17,7 +17,8 @@ int FPS = 30;
 
 const int BufferSize = 10;
 
-const char *levelArray[5] ={"Level 1", "Level 2", "Level 3", "Level 4", "Level 5"};
+const char *levelArray[10] ={"Level 1", "Level 2", "Level 3", "Level 4", "Level 5",
+                            "Level 6", "Level 7", "Level 8", "Level 9", "Level 10"};
 
 // get microseconds
 unsigned long now() {
@@ -359,6 +360,54 @@ void eventloop(XInfo& xinfo) {
             dList.push_back(new Rectangular(blockPos3.x + 2*Interval2, blockPos3.y, blockWidth3, blockHeight3));
             
             repaint(dList, xinfo);
+
+            // Q16. Check collision
+            // Collide on second layer, check frog position with the 4 blocks' positions
+            if ((frogPos.y == 50) && 
+                (((frogPos.x >= blockPos1.x) && (frogPos.x <= blockPos1.x + blockWidth1)) ||                         //check frog's top left position with first block 
+                 ((frogPos.x + frogSize >= blockPos1.x) && (frogPos.x + frogSize <= blockPos1.x + blockWidth1)) ||   //check frog's top right position with first block 
+                 ((frogPos.x >= blockPos1.x + Interval3) && (frogPos.x <= blockPos1.x + Interval3 + blockWidth1)) || //check frog's top left position with second block 
+                 ((frogPos.x + frogSize >= blockPos1.x + Interval3) && (frogPos.x + frogSize <= blockPos1.x + Interval3 + blockWidth1)) ||
+                 ((frogPos.x >= blockPos1.x + 2*Interval3) && (frogPos.x <= blockPos1.x + 2*Interval3 + blockWidth1)) ||
+                 ((frogPos.x + frogSize >= blockPos1.x + 2*Interval3) && (frogPos.x + frogSize <= blockPos1.x + 2*Interval3 + blockWidth1)) ||
+                 ((frogPos.x >= blockPos1.x + 3*Interval3) && (frogPos.x <= blockPos1.x + 3*Interval3 + blockWidth1)) ||
+                 ((frogPos.x + frogSize >= blockPos1.x + 3*Interval3) && (frogPos.x + frogSize <= blockPos1.x + 3*Interval3 + blockWidth1)))) {
+                level = 0;
+                frogPos.x = 400; frogPos.y = 200;
+                blockDir1.x = level+1;
+                blockDir2.x = -(level+1);
+                blockDir3.x = level+1;
+            } else if ((frogPos.y == 100) &&
+                (((blockPos2.x >= frogPos.x) && (blockPos2.x <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x + blockWidth2 >= frogPos.x) && (blockPos2.x + blockWidth2 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - Interval4 >= frogPos.x) && (blockPos2.x - Interval4 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - Interval4 + blockWidth2 >= frogPos.x) && (blockPos2.x - Interval4 + blockWidth2 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 2*Interval4 >= frogPos.x) && (blockPos2.x - 2*Interval4 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 2*Interval4 + blockWidth2 >= frogPos.x) && (blockPos2.x - 2*Interval4 + blockWidth2 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 3*Interval4 >= frogPos.x) && (blockPos2.x - 3*Interval4 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 3*Interval4 + blockWidth2 >= frogPos.x) && (blockPos2.x - 3*Interval4 + blockWidth2 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 4*Interval4 >= frogPos.x) && (blockPos2.x - 4*Interval4 <=  frogPos.x + frogSize)) ||
+                 ((blockPos2.x - 4*Interval4 + blockWidth2 >= frogPos.x) && (blockPos2.x - 4*Interval4 + blockWidth2 <=  frogPos.x + frogSize)))){
+                level = 0;
+                frogPos.x = 400; frogPos.y = 200;
+                blockDir1.x = level+1;
+                blockDir2.x = -(level+1);
+                blockDir3.x = level+1;
+            } else if ((frogPos.y == 150) && 
+                (((frogPos.x >= blockPos3.x) && (frogPos.x <= blockPos3.x + blockWidth3)) ||
+                 ((frogPos.x + frogSize >= blockPos3.x) && (frogPos.x + frogSize <= blockPos3.x + blockWidth3)) ||
+                 ((frogPos.x >= blockPos3.x + Interval2) && (frogPos.x <= blockPos3.x + Interval2 + blockWidth3)) ||
+                 ((frogPos.x + frogSize >= blockPos3.x + Interval2) && (frogPos.x + frogSize <= blockPos3.x + Interval2 + blockWidth3)) ||
+                 ((frogPos.x >= blockPos3.x + 2*Interval2) && (frogPos.x <= blockPos3.x + 2*Interval2 + blockWidth3)) ||
+                 ((frogPos.x + frogSize >= blockPos3.x + 2*Interval2) && (frogPos.x + frogSize <= blockPos3.x + 2*Interval2 + blockWidth3)))){
+                level = 0;
+                frogPos.x = 400; frogPos.y = 200;
+                blockDir1.x = level+1;
+                blockDir2.x = -(level+1);
+                blockDir3.x = level+1;
+            }
+
+            // Q15. At the moment when a block reaches one side of the window, a new block comes out from the other side of the window.
             if (blockPos1.x + 2*Interval3 > 800){
                 blockPos1.x = -50;
             }
@@ -368,19 +417,12 @@ void eventloop(XInfo& xinfo) {
             if (blockPos3.x + Interval2 > 750){
                 blockPos3.x = -100;
             }
+
+            // uodate blocks positions
             blockPos1.x += blockDir1.x;
             blockPos2.x += blockDir2.x;
             blockPos3.x += blockDir3.x;
 
-/*
-            // bounce ball
-            if (ballPos.x + ballSize/2 > w.width ||
-                ballPos.x - ballSize/2 < 0)
-                ballDir.x = -ballDir.x;
-            if (ballPos.y + ballSize/2 > w.height ||
-                ballPos.y - ballSize/2 < 0)
-                ballDir.y = -ballDir.y;
-*/
             XFlush( xinfo.display );
 
             lastRepaint = now(); // remember when the paint happened
