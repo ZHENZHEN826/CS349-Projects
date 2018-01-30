@@ -200,8 +200,14 @@ void eventloop(XInfo& xinfo) {
     char text[BufferSize];
     // list of Displayables
     list<Displayable*> dList;
-    // Print four rectangulars
-    //dList.push_back(new Rectangular(400, 200, 50, 50));
+
+    // level info
+    Text* txt = NULL;
+    int level = 0;
+    //txt = new Text(725, 25, levelArray[level]);
+    //txt->paint(xinfo);
+
+    // Three moving block + frog
     XPoint blockPos1;
     blockPos1.x = 0;
     blockPos1.y = 50;
@@ -234,19 +240,6 @@ void eventloop(XInfo& xinfo) {
     int Interval2 = 850/2;
     
 
-    //dList.push_back(new Text(725, 25, "Level: 1"));
-
-    // paint everything in the display list
-    //repaint(dList, xinfo);
-
-    XFlush(xinfo.display);
-
-    // print level info
-    Text* txt = NULL;
-    int level = 0;
-    txt = new Text(725, 25, levelArray[level]);
-    txt->paint(xinfo);
-
     // Frog postition, size, and velocity
     XPoint frogPos;
     frogPos.x = 400;
@@ -256,9 +249,12 @@ void eventloop(XInfo& xinfo) {
     frogDir.x = 50;
     frogDir.y = 50;
 
-    Rectangular* rec = NULL;
-    rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-    rec->paint(xinfo);
+
+    XFlush(xinfo.display);
+
+    //Rectangular* rec = NULL;
+    //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
+    //rec->paint(xinfo);
 
     // time of last window paint
     unsigned long lastRepaint = 0;
@@ -279,16 +275,20 @@ void eventloop(XInfo& xinfo) {
                     return;
                 }
                 if ( i == 1 && text[0] == 'n' && (frogPos.y == 0)) {
-                    level += 1;
                     XClearWindow(xinfo.display, xinfo.window);
+                    level += 1;
+                    blockDir1.x = level+1;
+                    blockDir2.x = -(level+1);
+                    blockDir3.x = level+1;
                     // update frog
                     frogPos.x =400;
                     frogPos.y = 200;
-                    rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                    rec->paint(xinfo);
+                    //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
+                    //rec->paint(xinfo);
                     // update text
-                    txt = new Text(725, 25, levelArray[level]);
-                    txt->paint(xinfo);
+                    //txt = new Text(725, 25, levelArray[level]);
+                    //txt->paint(xinfo);
+                    repaint(dList, xinfo);
                     break;
                 }
                 switch(key){
@@ -297,12 +297,7 @@ void eventloop(XInfo& xinfo) {
                         // update frog position
                         if (frogPos.y - frogSize/2 > 0)
                             frogPos.y -= frogDir.y;
-                        // draw frog
-                        rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        rec->paint(xinfo);
-
-                        txt = new Text(725, 25, levelArray[level]);
-                        txt->paint(xinfo);
+                        
                         repaint(dList, xinfo);
                         break;
                     case XK_Down:
@@ -310,12 +305,7 @@ void eventloop(XInfo& xinfo) {
                         // update frog position
                         if ((frogPos.y + frogSize < w.height) && (frogPos.y > 0))
                             frogPos.y += frogDir.y;
-                        // draw frog
-                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        //rec->paint(xinfo);
 
-                        //txt = new Text(725, 25, levelArray[level]);
-                        //txt->paint(xinfo);
                         repaint(dList, xinfo);
                         break;
                     case XK_Left:
@@ -323,12 +313,7 @@ void eventloop(XInfo& xinfo) {
                         // update frog position
                         if (frogPos.x - frogSize/2 > 0)
                             frogPos.x -= frogDir.x;
-                        // draw frog
-                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        //rec->paint(xinfo);
-
-                        //txt = new Text(725, 25, levelArray[level]);
-                        //txt->paint(xinfo);
+                        
                         repaint(dList, xinfo);
                         break;
                     case XK_Right:
@@ -336,12 +321,7 @@ void eventloop(XInfo& xinfo) {
                         // update frog position
                         if (frogPos.x + frogSize < w.width)
                             frogPos.x += frogDir.x;
-                        // draw frog
-                        //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                        //rec->paint(xinfo);
-
-                        //txt = new Text(725, 25, levelArray[level]);
-                        //txt->paint(xinfo);
+                        
                         repaint(dList, xinfo);
                         break;
                     }
@@ -381,10 +361,6 @@ void eventloop(XInfo& xinfo) {
             blockPos3.x += blockDir3.x;
 
 /*
-            // update ball position
-            ballPos.x += ballDir.x;
-            ballPos.y += ballDir.y;
-
             // bounce ball
             if (ballPos.x + ballSize/2 > w.width ||
                 ballPos.x - ballSize/2 < 0)
@@ -399,9 +375,9 @@ void eventloop(XInfo& xinfo) {
         }
 
         // IMPORTANT: sleep for a bit to let other processes work
-        //if (XPending(xinfo.display) == 0) {
-        //    usleep(1000000 / FPS - (end - lastRepaint));
-        //}
+        if (XPending(xinfo.display) == 0) {
+            usleep(1000000 / FPS - (end - lastRepaint));
+        }
 
     } //while
     XCloseDisplay(xinfo.display);
