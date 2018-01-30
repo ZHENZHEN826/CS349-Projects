@@ -219,7 +219,7 @@ void eventloop(XInfo& xinfo) {
     
     
     XPoint blockPos2;
-    blockPos2.x = 0;
+    blockPos2.x = 850/4*3;
     blockPos2.y = 100;
     int blockWidth2 = 20;
     int blockHeight2 = 50;
@@ -346,16 +346,28 @@ void eventloop(XInfo& xinfo) {
             dList.push_back(new Rectangular(blockPos1.x, blockPos1.y, blockWidth1, blockWidth1));
             dList.push_back(new Rectangular(blockPos1.x + Interval3, blockPos1.y, blockWidth1, blockWidth1));
             dList.push_back(new Rectangular(blockPos1.x + 2*Interval3, blockPos1.y, blockWidth1, blockWidth1));
+            dList.push_back(new Rectangular(blockPos1.x + 3*Interval3, blockPos1.y, blockWidth1, blockWidth1));
             // blocks in third row
             dList.push_back(new Rectangular(blockPos2.x, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x + Interval4, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x + 2*Interval4, blockPos2.y, blockWidth2, blockHeight2));
-            dList.push_back(new Rectangular(blockPos2.x + 3*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x - Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x - 2*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x - 3*Interval4, blockPos2.y, blockWidth2, blockHeight2));
+            dList.push_back(new Rectangular(blockPos2.x - 4*Interval4, blockPos2.y, blockWidth2, blockHeight2));
             // blocks in forth row
             dList.push_back(new Rectangular(blockPos3.x, blockPos3.y, blockWidth3, blockHeight3));
             dList.push_back(new Rectangular(blockPos3.x + Interval2, blockPos3.y, blockWidth3, blockHeight3));
+            dList.push_back(new Rectangular(blockPos3.x + 2*Interval2, blockPos3.y, blockWidth3, blockHeight3));
             
             repaint(dList, xinfo);
+            if (blockPos1.x + 2*Interval3 > 800){
+                blockPos1.x = -50;
+            }
+            if (blockPos2.x - 3*Interval4 < 0){
+                blockPos2.x = 850;
+            }
+            if (blockPos3.x + Interval2 > 750){
+                blockPos3.x = -100;
+            }
             blockPos1.x += blockDir1.x;
             blockPos2.x += blockDir2.x;
             blockPos3.x += blockDir3.x;
