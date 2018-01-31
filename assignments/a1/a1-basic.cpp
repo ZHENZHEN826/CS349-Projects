@@ -1,42 +1,27 @@
-#include <cstdlib>
-#include <stdio.h>
-#include <stdlib.h>
-#include <ctype.h>
-#include <iostream>
-#include <vector>
-#include <list>
-#include <unistd.h> // needed for sleep
-#include <sys/time.h>
-#include <X11/Xlib.h>
-#include <X11/Xutil.h>
+#include "a1-basic.h"
 
-using namespace std;
-
-// frames per second to run animation loop
-int FPS = 30;
-
-const int BufferSize = 10;
-
-const char *levelArray[20] ={"Level 1", "Level 2", "Level 3", "Level 4", "Level 5",
-                             "Level 6", "Level 7", "Level 8", "Level 9", "Level 10",
-                             "Level 11", "Level 12", "Level 13", "Level 14", "Level 15"
-                             "Level 16", "Level 17", "Level 18", "Level 19", "Level 20"};
-
-// get microseconds
+/*
+ * Get microseconds
+ */
 unsigned long now() {
     timeval tv;
     gettimeofday(&tv, NULL);
     return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
+
 /*
- * Function to put out a message on error exits.
+ * Put out a message on error exits.
  */
 void error( string str ) {
     cerr << str << endl;
     exit(0);
 }
 
+
+/*
+ * Check if command line input is a positive number.
+ */
 bool isPositiveNumber(char number[]) {
     // Negative numbers
     if (number[0] == '-')
@@ -48,90 +33,29 @@ bool isPositiveNumber(char number[]) {
     return true;
 }
 
-/*
- * Information to draw on the window.
- */
-struct XInfo {
-    Display*    display;
-    int      screen;
-    Window   window;
-    GC       gc;
-};
-
-class Displayable {
-public:
-    virtual void paint (XInfo &xinfo) = 0;
-};
 
 /*
- * A text displayable
+ * Create screen, display and window
  */
-class Text : public Displayable {
-public:
-  virtual void paint(XInfo& xinfo) {
-    XDrawImageString( xinfo.display, xinfo.window, xinfo.gc,
-                      this->x, this->y, this->s.c_str(), this->s.length() );
-  }
-
-  // constructor
-  Text(int x, int y, string s): x(x), y(y), s(s)  {}
-
-private:
-  int x;
-  int y;
-  string s; // string to show
-};
-
-class Rectangular : public Displayable {
-public:
-  virtual void paint(XInfo& xinfo) {
-
-     // create a simple graphics context
-    GC gc = XCreateGC(xinfo.display, xinfo.window, 0, 0);
-    int screen = xinfo.screen; //bug?
-    XSetForeground(xinfo.display, gc, BlackPixel(xinfo.display, screen));
-    XSetBackground(xinfo.display, gc, WhitePixel(xinfo.display, screen));
-    XSetFillStyle(xinfo.display,  gc, FillSolid);
-    XSetLineAttributes(xinfo.display, gc,
-                       3,       // 3 is line width
-                       LineSolid, CapButt, JoinRound);         // other line options
-
-    XFillRectangle(xinfo.display, xinfo.window, gc, x, y, width, height);
-  }
-
-  // constructor
-  Rectangular(int x, int y, int width, int height): x(x), y(y), width(width), height(height) {}
-
-private:
-  int x;
-  int y;
-  int width;
-  int height;
-};
-
-
 void initX(int argc, char* argv[], XInfo& xinfo) {
     XSizeHints hints;
-
+    // define window sizes
     hints.x = 100;
     hints.y = 100;
     hints.width = 850;
     hints.height = 250;
     hints.flags = PPosition | PSize;
-
-    /*
-    * Display opening uses the DISPLAY  environment variable.
-    * It can go wrong if DISPLAY isn't set, or you don't have permission.
-    */
+    
+    // Display opening uses the DISPLAY  environment variable.
+    // It can go wrong if DISPLAY isn't set, or you don't have permission.
     xinfo.display = XOpenDisplay( "" );
     if ( !xinfo.display )   {
         error( "Can't open display." );
     }
 
-    /*
-    * Find out some things about the display you're using.
-    */
-    // DefaultScreen is as macro to get default screen index
+    
+    //Find out some things about the display you're using.
+    // DefaultScreen is as macro to get default screen index.
     xinfo.screen = DefaultScreen( xinfo.display ); 
 
     unsigned long white, black;
@@ -145,43 +69,44 @@ void initX(int argc, char* argv[], XInfo& xinfo) {
         hints.width, hints.height,  // size of the window
         10,                         // width of window's border
         black,                      // window border colour
-        white );                        // window background colour
+        white );                    // window background colour
 
-    // extra window properties like a window title
+    // Extra window properties like a window title.
     XSetStandardProperties(
         xinfo.display,      // display containing the window
         xinfo.window,       // window whose properties are set
         "Frog",             // window's title
-        "Frog",               // icon's title
+        "Frog",             // icon's title
         None,               // pixmap for the icon
         argv, argc,         // applications command line args
         &hints);            // size hints for the window
 
-    xinfo.gc = XCreateGC(xinfo.display, xinfo.window, 0, 0);   // create a graphics context
+    // Create a graphics context.
+    xinfo.gc = XCreateGC(xinfo.display, xinfo.window, 0, 0);   
 
-    // drawing demo with graphics context here ...
+    // Drawing demo with graphics context here.
     XSetBackground(xinfo.display, xinfo.gc, white);
     XSetForeground(xinfo.display, xinfo.gc, black);
     
-    // load a larger font
+    // Load a larger font.
     XFontStruct * font;
     font = XLoadQueryFont (xinfo.display, "10x20");
     XSetFont (xinfo.display, xinfo.gc, font->fid);
-
-    XSelectInput(xinfo.display, xinfo.window, KeyPressMask); // select events
-
-    /*
-     * Put the window on the screen.
-     */
+    // Select events.
+    XSelectInput(xinfo.display, xinfo.window, KeyPressMask); 
+    
+    // Put the window on the screen.
     XMapRaised( xinfo.display, xinfo.window );
 
     XFlush(xinfo.display);
 
-    sleep(1);  // give server time to setup
+    // Give server time to setup.
+    sleep(1);  
 }
 
+
 /*
- * Function to repaint a display list
+ * Function to repaint a display list.
  */
 void repaint( list<Displayable*> dList, XInfo& xinfo) {
   list<Displayable*>::const_iterator begin = dList.begin();
@@ -196,145 +121,149 @@ void repaint( list<Displayable*> dList, XInfo& xinfo) {
   XFlush(xinfo.display);
 }
 
-// The loop responding to events from the user.
+/*
+ * The loop responding to events from the user.
+ */
 void eventloop(XInfo& xinfo) {
     XEvent event;
     KeySym key;
     char text[BufferSize];
-    // list of Displayables
+    // List of Displayables
     list<Displayable*> dList;
 
-    // level info
+    // Level info
     Text* txt = NULL;
     int level = 0;
-    //txt = new Text(725, 25, levelArray[level]);
-    //txt->paint(xinfo);
 
-    // Three moving block + frog
+    // Initialize three types of moving blocks, and the frog
+    // blocks on the second line:
     XPoint blockPos1;
-    blockPos1.x = 0;
-    blockPos1.y = 50;
-    int blockWidth1 = 50;
+    blockPos1.x = 0; blockPos1.y = 50;          // initial position
+    
     XPoint blockDir1;
-    blockDir1.x = 1;
-    blockDir1.y = 0;
-    int Interval3 = 850/3;
+    blockDir1.x = 1; blockDir1.y = 0;           // moving direction
+    int blockWidth1 = 50;                       // block width
+    int Interval3 = 850/3;                      // space between two blocks
     
-    
+    // blocks on the third line:
     XPoint blockPos2;
-    blockPos2.x = 850/4*3;
-    blockPos2.y = 100;
-    int blockWidth2 = 20;
-    int blockHeight2 = 50;
-    XPoint blockDir2;
-    blockDir2.x = -1;
-    blockDir2.y = 0;
-    int Interval4 = 850/4;
+    blockPos2.x = 850/4*3; blockPos2.y = 100;   // initial position
     
-
+    XPoint blockDir2;
+    blockDir2.x = -1; blockDir2.y = 0;          // moving direction 
+    int blockWidth2 = 20;                       // block width
+    int blockHeight2 = 50;                      // block height
+    int Interval4 = 850/4;                      // space between two blocks
+    
+    // blocks on the forth line:
     XPoint blockPos3;
-    blockPos3.x = 0;
-    blockPos3.y = 150;
+    blockPos3.x = 0; blockPos3.y = 150;
+    
+    XPoint blockDir3;
+    blockDir3.x = 1; blockDir3.y = 0;
     int blockWidth3 = 100;
     int blockHeight3 = 50;
-    XPoint blockDir3;
-    blockDir3.x = 1;
-    blockDir3.y = 0;
     int Interval2 = 850/2;
     
 
     // Frog postition, size, and velocity
     XPoint frogPos;
-    frogPos.x = 400;
-    frogPos.y = 200;
-    int frogSize = 50;
+    frogPos.x = 400; frogPos.y = 200;           // Initially, in the middle of last line
+    
     XPoint frogDir;
-    frogDir.x = 50;
-    frogDir.y = 50;
+    frogDir.x = 50; frogDir.y = 50;
+    int frogSize = 50;                          // Frog is a 50*50 square
 
 
     XFlush(xinfo.display);
 
-    //Rectangular* rec = NULL;
-    //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-    //rec->paint(xinfo);
-
     // time of last window paint
     unsigned long lastRepaint = 0;
-
+    // window infomation
     XWindowAttributes w;
     XGetWindowAttributes(xinfo.display, xinfo.window, &w);
 
-    while ( true ) { // event loop until 'exit'
+    // event loop until 'exit'
+    while ( true ) { 
+        // any event pending?
         if (XPending(xinfo.display) > 0) { 
-            XNextEvent( xinfo.display, &event ); // wait for next event
+            // wait for next event
+            XNextEvent( xinfo.display, &event ); 
 
             switch ( event.type ) {
-            case KeyPress: // any keypress
+            // any key press
+            case KeyPress: 
                 int i = XLookupString( 
                     (XKeyEvent*)&event, text, BufferSize, &key, 0 );
+                // press q to exit
                 if ( i == 1 && text[0] == 'q' ) {
                     XCloseDisplay(xinfo.display);
                     return;
                 }
+                // press n to go to next level while the frog is in goal area
                 if ( i == 1 && text[0] == 'n' && (frogPos.y == 0)) {
                     XClearWindow(xinfo.display, xinfo.window);
+                    // increase the level, blocks move faster
                     level += 1;
                     blockDir1.x = level+1;
                     blockDir2.x = -(level+1);
                     blockDir3.x = level+1;
-                    // update frog
+                    // update the frog's position
                     frogPos.x =400;
                     frogPos.y = 200;
-                    //rec = new Rectangular(frogPos.x, frogPos.y, frogSize, frogSize);
-                    //rec->paint(xinfo);
-                    // update text
-                    //txt = new Text(725, 25, levelArray[level]);
-                    //txt->paint(xinfo);
+                   
                     repaint(dList, xinfo);
                     break;
                 }
                 switch(key){
+                    // arrow key UP
                     case XK_Up:
                         XClearWindow(xinfo.display, xinfo.window);
-                        // update frog position
+                        // update frog's position
+                        // do nothing if already at top layer
                         if (frogPos.y - frogSize/2 > 0)
                             frogPos.y -= frogDir.y;
                         
                         repaint(dList, xinfo);
                         break;
+                    // arrow key DOWN
                     case XK_Down:
                         XClearWindow(xinfo.display, xinfo.window);
                         // update frog position
+                        // do nothing if already at bottom layer
                         if ((frogPos.y + frogSize < w.height) && (frogPos.y > 0))
                             frogPos.y += frogDir.y;
 
                         repaint(dList, xinfo);
                         break;
+                    // arrow key LEFT
                     case XK_Left:
                         XClearWindow(xinfo.display, xinfo.window);
-                        // update frog position
+                        // update frog's position
+                        // do nothing if there is a wall on the left
                         if (frogPos.x - frogSize/2 > 0)
                             frogPos.x -= frogDir.x;
                         
                         repaint(dList, xinfo);
                         break;
+                    // arrow key RIGHT
                     case XK_Right:
                         XClearWindow(xinfo.display, xinfo.window);
-                        // update frog position
+                        // update frog's position
+                        // do nothing if there is a wall on the right
                         if (frogPos.x + frogSize < w.width)
                             frogPos.x += frogDir.x;
                         
                         repaint(dList, xinfo);
                         break;
                     }
-
                 break;
             }
         }
 
-        unsigned long end = now();  // get time in microsecond
-
+        // get current time in microsecond
+        unsigned long end = now();  
+        // if it's time to repaint animation, 1000000 = 1s
         if (end - lastRepaint > 1000000 / FPS) { 
 
             // clear background
@@ -363,12 +292,16 @@ void eventloop(XInfo& xinfo) {
             
             repaint(dList, xinfo);
 
-            // Q16. Check collision
-            // Collide on second layer, check frog position with the 4 blocks' positions
-            bool collideOnSecondLayer = ((frogPos.y == 50) && 
-                (((frogPos.x >= blockPos1.x) && (frogPos.x <= blockPos1.x + blockWidth1)) ||                         //check frog's top left position with first block 
-                 ((frogPos.x + frogSize >= blockPos1.x) && (frogPos.x + frogSize <= blockPos1.x + blockWidth1)) ||   //check frog's top right position with first block 
-                 ((frogPos.x >= blockPos1.x + Interval3) && (frogPos.x <= blockPos1.x + Interval3 + blockWidth1)) || //check frog's top left position with second block 
+            // Q16. Check collision:
+            // Collide on second layer, check frog' top left and top right positions with the 4 moving blocks' positions
+            bool collideOnSecondLayer = ((frogPos.y == 50) &&
+                //check frog's top left position with first block 
+                (((frogPos.x >= blockPos1.x) && (frogPos.x <= blockPos1.x + blockWidth1)) ||
+                 //check frog's top right position with first block                        
+                 ((frogPos.x + frogSize >= blockPos1.x) && (frogPos.x + frogSize <= blockPos1.x + blockWidth1)) ||   
+                 //check frog's top left position with second block
+                 ((frogPos.x >= blockPos1.x + Interval3) && (frogPos.x <= blockPos1.x + Interval3 + blockWidth1)) || 
+                 //check frog's top right position with second block... 
                  ((frogPos.x + frogSize >= blockPos1.x + Interval3) && (frogPos.x + frogSize <= blockPos1.x + Interval3 + blockWidth1)) ||
                  ((frogPos.x >= blockPos1.x + 2*Interval3) && (frogPos.x <= blockPos1.x + 2*Interval3 + blockWidth1)) ||
                  ((frogPos.x + frogSize >= blockPos1.x + 2*Interval3) && (frogPos.x + frogSize <= blockPos1.x + 2*Interval3 + blockWidth1)) ||
@@ -395,10 +328,13 @@ void eventloop(XInfo& xinfo) {
                  ((frogPos.x >= blockPos3.x + 2*Interval2) && (frogPos.x <= blockPos3.x + 2*Interval2 + blockWidth3)) ||
                  ((frogPos.x + frogSize >= blockPos3.x + 2*Interval2) && (frogPos.x + frogSize <= blockPos3.x + 2*Interval2 + blockWidth3))));
 
+            // If collision happens
             if (collideOnSecondLayer || collideOnThirdLayer || collideOnForthLayer){
-                // If collision happens, reset the level to 1 and move the frog back to the initial position.
+                // reset the level to 1 
                 level = 0;
+                // move the frog back to the initial position
                 frogPos.x = 400; frogPos.y = 200;
+                // rest blocks moving speed
                 blockDir1.x = level+1;
                 blockDir2.x = -(level+1);
                 blockDir3.x = level+1;
@@ -422,7 +358,8 @@ void eventloop(XInfo& xinfo) {
 
             XFlush( xinfo.display );
 
-            lastRepaint = now(); // remember when the paint happened
+            // remember when the paint happened
+            lastRepaint = now(); 
         }
 
         // IMPORTANT: sleep for a bit to let other processes work
@@ -435,6 +372,7 @@ void eventloop(XInfo& xinfo) {
 }
 
 int main( int argc, char* argv[] ) {
+    // FPS can be changed on command line
     if (argc == 2 ){
         if (isPositiveNumber(argv[1])){
             FPS = atoi(argv[1]);
