@@ -165,6 +165,7 @@ class DemoBoxLayout3 extends JPanel {
 
 		// Add the components 
 		this.add(new JButton("One"));
+		// Min space is 10
 		this.add(Box.createRigidArea(new Dimension(0,10)));
 		this.add(Box.createVerticalGlue());
 		this.add(new JButton("Two"));

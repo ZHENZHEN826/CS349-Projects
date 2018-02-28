@@ -73,10 +73,10 @@ public:
     // create a clip window
     XRectangle clip_rect;
 
-    clip_rect.x = 50;
-    clip_rect.y = 50;
-    clip_rect.width = 200;
-    clip_rect.height = 200;
+    clip_rect.x = 0;
+    clip_rect.y = 0;
+    clip_rect.width = 300;
+    clip_rect.height = 300;
 
     // clips all drawings that use the same GC after this call ...
     XSetClipRectangles(xinfo.display, xinfo.gc, 

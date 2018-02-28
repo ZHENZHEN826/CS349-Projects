@@ -13,6 +13,7 @@ class Bikes1 {
 		void setSpeed(int val) { speed = val; }
 		void show() {
 			System.out.println("wheels  = " + wheels);
+			System.out.println("speed  = " + speed);
 		}
 	}
 

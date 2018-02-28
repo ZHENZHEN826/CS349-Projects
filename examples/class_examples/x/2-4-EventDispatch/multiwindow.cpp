@@ -141,7 +141,7 @@ int main ( int argc, char *argv[] ) {
 
 	// true: window is like heavyweight widget embedded in window
 	// false: window is just another window
-	bool isSibling = false;
+	bool isSibling = true;
 
 		/*
 	* Display opening uses the DISPLAY	environment variable.
