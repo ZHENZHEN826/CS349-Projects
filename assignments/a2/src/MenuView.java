@@ -137,7 +137,8 @@ public class MenuView extends JPanel implements Observer {
 
         this.strokeWidthItem.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                
+            	// strokeWidthItem.get
+             //    model.setStrokeWidth();
             }
         });
 

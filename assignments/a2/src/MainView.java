@@ -17,7 +17,7 @@ public class MainView extends JFrame implements Observer {
     public MainView(Model model) {
         // Set up the window.
         this.setTitle("CS 349 W18 A2");
-        this.setMinimumSize(new Dimension(128, 128));
+        this.setMinimumSize(new Dimension(500, 500));
         this.setSize(800, 600);
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -29,10 +29,10 @@ public class MainView extends JFrame implements Observer {
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(new MenuView(model), BorderLayout.NORTH);
         this.getContentPane().add(Box.createVerticalStrut(0));
-        this.getContentPane().add(new ToolbarView(model), BorderLayout.NORTH);
+        this.getContentPane().add(new ToolbarView(model), BorderLayout.SOUTH);
         this.getContentPane().add(Box.createVerticalStrut(1));
         this.getContentPane().add(new ShapeDemo(model));
-        
+
         this.pack();
         this.setVisible(true);
     }

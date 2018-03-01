@@ -6,7 +6,7 @@ public class Model {
     // the data in the model
     int mode = 1;              // 0 for selection mode, 1 for drawing mode
     int drawingShape= 0;       // 0 for freeform line, 1 for straight line,
-                               // 2 for rectangle, 4 for ellipse 
+                               // 2 for rectangle, 3 for ellipse 
     int strokeWidth = 1;       // 1 -10 px
     Color fillColor= Color.white;   // Color used to fill a shape
     Color strokeColor = Color.black; // Color used in stroke
