@@ -16,6 +16,8 @@ import javax.vecmath.*;
 import javax.swing.*;
 import java.awt.event.*;
 
+import java.util.Arrays;
+
 // create the window and run the demo
 public class ShapeDemo extends JPanel implements Observer {
 	private Model model;
@@ -24,8 +26,9 @@ public class ShapeDemo extends JPanel implements Observer {
 
     ShapeDemo(Model theModel) {
 		this.model = theModel;
-		
-		
+		//this.shape = new Shape();
+		Point M = new Point(); // mouse point
+
         this.addMouseListener(new MouseAdapter(){
             public void mousePressed(MouseEvent e) {
             	shape = new Shape();
@@ -37,8 +40,8 @@ public class ShapeDemo extends JPanel implements Observer {
                 //shape.setColour(model.fillColor);
 
                 // try setting scale to something other than 1 
-                shape.setScale(1.0f);
-
+                //shape.setScale(1.0f);
+            	shape.updateStartPoint();
                 repaint();
             }
 
@@ -48,6 +51,11 @@ public class ShapeDemo extends JPanel implements Observer {
         });
 
         this.addMouseMotionListener(new MouseAdapter(){
+        	public void mouseMoved(MouseEvent e){
+        		M.x = e.getX();
+                M.y = e.getY();
+                repaint();
+        	}
             public void mouseDragged(MouseEvent e) {
                 shape.addPoint(e.getX(), e.getY());
                 repaint();      
@@ -167,6 +175,10 @@ public class ShapeDemo extends JPanel implements Observer {
 	        pointsChanged = false;
 	    }
 		
+		int startPoint = 0;
+		public void updateStartPoint() {
+			startPoint = npoints;
+		}
 	    int drawShape = model.drawingShape;   // 0 for freeform line, 1 for straight line,
                                				  // 2 for rectangle, 3 for ellipse 
 
@@ -191,6 +203,8 @@ public class ShapeDemo extends JPanel implements Observer {
 	        g2.setColor(colour);
 	        g2.setStroke(new BasicStroke(strokeThickness)); 
 
+	        //double mouseStartX = points.get(startPoint).x;
+	        //double mouseStartY = points.get(startPoint).y;
 	        double mouseStartX = points.get(0).x;
 	        double mouseStartY = points.get(0).y;
 	        double mouseEndX = points.get(npoints-1).x;

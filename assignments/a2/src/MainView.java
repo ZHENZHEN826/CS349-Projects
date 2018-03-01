@@ -28,8 +28,6 @@ public class MainView extends JFrame implements Observer {
 
         this.getContentPane().setLayout(new BorderLayout());
         this.getContentPane().add(new MenuView(model), BorderLayout.NORTH);
-        this.getContentPane().add(Box.createVerticalStrut(0));
-        this.getContentPane().add(new ToolbarView(model), BorderLayout.SOUTH);
         this.getContentPane().add(Box.createVerticalStrut(1));
         this.getContentPane().add(new ShapeDemo(model));
 
