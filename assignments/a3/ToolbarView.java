@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Observable;
 import java.util.Observer;
@@ -28,11 +29,33 @@ public class ToolbarView extends JToolBar implements Observer {
             add(button);
         }
 
-        this.update(null, null);
+        // controllers for undo menu item
+        undo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                // if (!model.shapes.isEmpty()) {
+
+                //     model.shapes.remove(model.shapes.size() - 1);
+                //     repaint();
+
+                // }
+                model.undo();
+            }
+        });
+        // controller for redo menu item
+        redo.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                model.redo();
+            }
+        });
+
+        undo.setEnabled(model.canUndo());
+        redo.setEnabled(model.canRedo());
+        //this.update(null, null);
     }
 
     @Override
     public void update(Observable o, Object arg) {
-
+        undo.setEnabled(model.canUndo());
+        redo.setEnabled(model.canRedo());
     }
 }
