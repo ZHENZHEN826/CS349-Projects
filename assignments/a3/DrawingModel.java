@@ -3,6 +3,7 @@ import java.util.List;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.undo.*;
 
 public class DrawingModel extends Observable {
@@ -32,6 +33,10 @@ public class DrawingModel extends Observable {
     public List<ShapeModel> getShapes() {
         return Collections.unmodifiableList(shapes);
     }
+
+    // public List<ShapeModel> getReverseShapes() {
+    //     return Collections.reverse(shapes.clone());
+    // }
 
     public void addShape(ShapeModel shape) {
         // recUndoable = new RectUndoable(pX, pY, absX, absY);

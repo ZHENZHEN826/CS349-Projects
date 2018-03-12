@@ -3,13 +3,16 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.util.Observable;
-import java.util.Observer;
+import java.util.*;
+// import java.util.Observable;
+// import java.util.Observer;
 
 public class CanvasView extends JPanel implements Observer {
     DrawingModel model;
     Point2D lastMouse;
     Point2D startMouse;
+    boolean mouseDragged;
+    Point2D clickPosition = null;
 
     public CanvasView(DrawingModel model) {
         super();
@@ -17,28 +20,55 @@ public class CanvasView extends JPanel implements Observer {
 
         MouseAdapter mouseListener = new MouseAdapter() {
             @Override
+            public void mouseClicked(MouseEvent e) {
+                super.mousePressed(e);
+                clickPosition = e.getPoint();
+
+                for(ShapeModel shape : model.getShapes()) {
+                    // g2.draw(shape.getShape());
+                    if (shape.hitTest(clickPosition)){
+                        shape.isSelected = true;
+                        System.out.println("Hit!!!");
+                        break;
+                    } else {
+                        shape.isSelected = false;
+                    }
+
+                }
+                repaint();
+            }
+
+            @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
                 lastMouse = e.getPoint();
                 startMouse = e.getPoint();
+
+                for(ShapeModel shape : model.getShapes()) {
+                    shape.isSelected = false;
+                }
+                repaint();
             }
 
             @Override
             public void mouseDragged(MouseEvent e) {
                 super.mouseDragged(e);
                 lastMouse = e.getPoint();
+                mouseDragged = true;
                 repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-
-                ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
-                model.addShape(shape);
-
+                if (mouseDragged){
+                    ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
+                    model.addShape(shape);
+                }
+                
                 startMouse = null;
                 lastMouse = null;
+                mouseDragged = false;
             }
         };
 
@@ -70,6 +100,19 @@ public class CanvasView extends JPanel implements Observer {
 
         for(ShapeModel shape : model.getShapes()) {
             g2.draw(shape.getShape());
+            if (shape.isSelected){
+                // Draw scale handles
+                shape.setBoundingBox();
+                int x = shape.boundingX + shape.boundingWidth;
+                int y = shape.boundingY + shape.boundingHeight;
+                g2.fillRect(x - 5, y - 5, 10, 10);
+                // Draw rotation handles
+                x = shape.boundingX + (shape.boundingWidth/2);
+                y = shape.boundingY - 10;
+                g2.fillOval(x - 5 , y - 5, 10, 10);
+                System.out.println("Draw two dots!");
+            }
+
         }
     }
 

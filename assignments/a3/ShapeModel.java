@@ -2,10 +2,31 @@ import java.awt.*;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 public class ShapeModel {
     Shape shape;
+    // Point2D mousePosition;
+    boolean isSelected = true;
 
-    public ShapeModel(Point startPoint, Point endPoint) {    }
+    double scale = 1.0;
+    // translation
+    // rotation
+
+    Rectangle boundingBox;// = shape.getBounds2D();
+    int boundingHeight, boundingWidth, boundingX, boundingY, halfBoundingWidth;
+    
+
+    public ShapeModel(Point startPoint, Point endPoint) { }
+
+    public void setBoundingBox(){
+        boundingBox = shape.getBounds();
+        boundingHeight = boundingBox.height;
+        boundingWidth = boundingBox.width;
+        boundingX = boundingBox.x;
+        boundingY = boundingBox.y;
+    }
 
     public Shape getShape() {
         return shape;
