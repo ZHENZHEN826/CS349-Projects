@@ -12,6 +12,7 @@ public class CanvasView extends JPanel implements Observer {
     Point2D lastMouse;
     Point2D startMouse;
     boolean mouseDragged;
+    boolean scaling = false;
     Point2D clickPosition = null;
 
     public CanvasView(DrawingModel model) {
@@ -45,7 +46,11 @@ public class CanvasView extends JPanel implements Observer {
                 startMouse = e.getPoint();
 
                 for(ShapeModel shape : model.getShapes()) {
-                    shape.isSelected = false;
+                    shape.scaleSelected = shape.onBottomCorner(e.getX(), e.getY());
+                    if (!shape.scaleSelected)
+                        shape.isSelected = false;
+
+                    System.out.println("scale selected: " + shape.scaleSelected);
                 }
                 repaint();
             }
@@ -55,13 +60,22 @@ public class CanvasView extends JPanel implements Observer {
                 super.mouseDragged(e);
                 lastMouse = e.getPoint();
                 mouseDragged = true;
+
+                for(ShapeModel shape : model.getShapes()) {
+                    if (shape.scaleSelected) {
+                        scaling = true;
+                        //shape.updateShape((Point) lastMouse);
+                        model.updateShape(shape, (Point) lastMouse);
+                    }
+                }
+                
                 repaint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
                 super.mouseReleased(e);
-                if (mouseDragged){
+                if (mouseDragged && !scaling){
                     ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
                     model.addShape(shape);
                 }
@@ -69,6 +83,7 @@ public class CanvasView extends JPanel implements Observer {
                 startMouse = null;
                 lastMouse = null;
                 mouseDragged = false;
+                scaling = false;
             }
         };
 
@@ -117,7 +132,7 @@ public class CanvasView extends JPanel implements Observer {
     }
 
     private void drawCurrentShape(Graphics2D g2) {
-        if (startMouse == null) {
+        if (startMouse == null || scaling) {
             return;
         }
 

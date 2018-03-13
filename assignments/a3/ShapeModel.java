@@ -10,12 +10,15 @@ public class ShapeModel {
     // Point2D mousePosition;
     boolean isSelected = true;
 
+    int handleSize = 5;
     double scale = 1.0;
     // translation
     // rotation
 
     Rectangle boundingBox;// = shape.getBounds2D();
-    int boundingHeight, boundingWidth, boundingX, boundingY, halfBoundingWidth;
+    int boundingHeight, boundingWidth, boundingX, boundingY;
+
+    boolean scaleSelected = false;
     
 
     public ShapeModel(Point startPoint, Point endPoint) { }
@@ -28,6 +31,25 @@ public class ShapeModel {
         boundingY = boundingBox.y;
     }
 
+    /** Convert from the component's X coordinate to the model's X coordinate. */
+    // protected double fromX(int x) {
+    //     return (x - this.getInsets().left) / this.scale;
+    // }
+
+    /** Convert from the component's Y coordinate to the model's Y coordinate. */
+    // protected double fromY(int y) {
+    //     return (this.getHeight() - 1 - this.getInsets().bottom - y)
+    //             / this.scale;
+    // }
+
+    public boolean onBottomCorner(int x, int y) {
+        System.out.println("onBottomCorner ~");
+        return Math.abs(x - (boundingX + boundingWidth)) < handleSize
+                 && Math.abs(y - (boundingY + boundingHeight)) < handleSize;
+        // return Math.abs(fromX(x) - this.model.getBase()) < handleSize
+        //         && Math.abs(fromY(y) - this.model.getHeight()) < handleSize;
+    }
+
     public Shape getShape() {
         return shape;
     }
@@ -36,6 +58,11 @@ public class ShapeModel {
     public boolean hitTest(Point2D p) {
         return this.getShape().contains(p);
     }
+
+    public Shape updateShape(Point endPoint) {
+        return shape;
+    }
+
 
     /**
      * Given a ShapeType and the start and end point of the shape, ShapeFactory constructs a new ShapeModel
@@ -53,6 +80,7 @@ public class ShapeModel {
                 return null;
             }
         }
+        
     }
 
     public enum ShapeType {

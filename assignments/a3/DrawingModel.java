@@ -1,6 +1,8 @@
 import java.util.*;
 import java.util.List;
-
+import java.awt.*;
+// import java.awt.Point;
+import java.awt.geom.Point2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -37,6 +39,62 @@ public class DrawingModel extends Observable {
     // public List<ShapeModel> getReverseShapes() {
     //     return Collections.reverse(shapes.clone());
     // }
+
+    public void updateShape(ShapeModel shape, Point endPoint) {
+        ShapeModel oldShape = shape;
+
+        int shapeIndex = shapes.indexOf(oldShape);
+
+        Shape tmp = shape.updateShape(endPoint);
+            //final ShapeModel newShape = shape.shape=;
+        ShapeModel newShape = getNewShape(shape, tmp);
+
+        UndoableEdit undoableEdit = new AbstractUndoableEdit() {
+
+            
+           
+
+            public void undo() throws CannotUndoException {
+                super.undo();
+                shapes.remove(shapeIndex);
+                shapes.add(shapeIndex, oldShape);
+                //shapes.remove(shapes.size() - 1);
+                //value = oldValue;
+                //System.out.println("Undo: update shape newShape: "+ newShape);
+                System.out.println("Undo: update shape oldShape: "+ oldShape);
+                
+                updateViews();
+            }
+            
+            
+
+            public void redo() throws CannotRedoException {
+                super.redo();
+                shapes.remove(shapeIndex);
+
+                
+
+                shapes.add(shapeIndex, newShape);
+                //value = newValue;
+                System.out.println("Redo: update shape newShape: "+ newShape);
+                System.out.println("Redo: update shape oldShape: "+ oldShape);
+                updateViews();
+            }
+
+        };
+        
+        // Add this undoable edit to the undo manager
+        undoManager.addEdit(undoableEdit);
+        shape = getNewShape(shape, tmp);
+        //shape.updateShape(endPoint)
+        
+        updateViews();
+    }
+
+    public ShapeModel getNewShape(ShapeModel shape, Shape tmp){
+        shape.shape = tmp;
+        return shape;
+    }
 
     public void addShape(ShapeModel shape) {
         // recUndoable = new RectUndoable(pX, pY, absX, absY);
