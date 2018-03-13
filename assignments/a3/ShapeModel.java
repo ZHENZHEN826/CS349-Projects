@@ -7,6 +7,10 @@ import java.awt.event.MouseEvent;
 
 public class ShapeModel {
     Shape shape;
+    ShapeType myShapeType;
+
+    Point startPoint;
+    Point endPoint;
     // Point2D mousePosition;
     boolean isSelected = true;
 
@@ -21,7 +25,7 @@ public class ShapeModel {
     boolean scaleSelected = false;
     
 
-    public ShapeModel(Point startPoint, Point endPoint) { }
+    public ShapeModel(Point startPoint, Point endPoint) {}
 
     public void setBoundingBox(){
         boundingBox = shape.getBounds();
@@ -70,10 +74,12 @@ public class ShapeModel {
      */
     public static class ShapeFactory {
         public ShapeModel getShape(ShapeType shapeType, Point startPoint, Point endPoint) {
+           
+
             try {
                 Class<? extends ShapeModel> clazz = shapeType.shape;
                 Constructor<? extends ShapeModel> constructor = clazz.getConstructor(Point.class, Point.class);
-
+                
                 return constructor.newInstance(startPoint, endPoint);
             } catch (Exception e) {
                 e.printStackTrace();

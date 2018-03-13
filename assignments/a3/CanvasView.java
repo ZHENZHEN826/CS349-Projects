@@ -29,7 +29,7 @@ public class CanvasView extends JPanel implements Observer {
                     // g2.draw(shape.getShape());
                     if (shape.hitTest(clickPosition)){
                         shape.isSelected = true;
-                        System.out.println("Hit!!!");
+                        // System.out.println("Hit!!!");
                         break;
                     } else {
                         shape.isSelected = false;
@@ -50,7 +50,7 @@ public class CanvasView extends JPanel implements Observer {
                     if (!shape.scaleSelected)
                         shape.isSelected = false;
 
-                    System.out.println("scale selected: " + shape.scaleSelected);
+                    // System.out.println("scale selected: " + shape.scaleSelected);
                 }
                 repaint();
             }
@@ -78,6 +78,7 @@ public class CanvasView extends JPanel implements Observer {
                 if (mouseDragged && !scaling){
                     ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
                     model.addShape(shape);
+                    model.addShapeField(shape, (Point) startMouse, (Point) lastMouse);
                 }
                 
                 startMouse = null;

@@ -41,50 +41,48 @@ public class DrawingModel extends Observable {
     // }
 
     public void updateShape(ShapeModel shape, Point endPoint) {
-        ShapeModel oldShape = shape;
+        // ShapeModel oldShape = shape;
 
-        int shapeIndex = shapes.indexOf(oldShape);
+        // int shapeIndex = shapes.indexOf(oldShape);
 
         Shape tmp = shape.updateShape(endPoint);
-            //final ShapeModel newShape = shape.shape=;
-        ShapeModel newShape = getNewShape(shape, tmp);
+        //     //final ShapeModel newShape = shape.shape=;
+        // ShapeModel newShape = getNewShape(shape, tmp);
 
-        UndoableEdit undoableEdit = new AbstractUndoableEdit() {
+        // UndoableEdit undoableEdit = new AbstractUndoableEdit() {
 
             
-           
-
-            public void undo() throws CannotUndoException {
-                super.undo();
-                shapes.remove(shapeIndex);
-                shapes.add(shapeIndex, oldShape);
-                //shapes.remove(shapes.size() - 1);
-                //value = oldValue;
-                //System.out.println("Undo: update shape newShape: "+ newShape);
-                System.out.println("Undo: update shape oldShape: "+ oldShape);
+        //     public void undo() throws CannotUndoException {
+        //         super.undo();
+        //         shapes.remove(shapeIndex);
+        //         shapes.add(shapeIndex, oldShape);
+        //         //shapes.remove(shapes.size() - 1);
+        //         //value = oldValue;
+        //         //System.out.println("Undo: update shape newShape: "+ newShape);
+        //         System.out.println("Undo: update shape oldShape: "+ oldShape);
                 
-                updateViews();
-            }
-            
+        //         updateViews();
+        //     }
+
             
 
-            public void redo() throws CannotRedoException {
-                super.redo();
-                shapes.remove(shapeIndex);
+        //     public void redo() throws CannotRedoException {
+        //         super.redo();
+        //         shapes.remove(shapeIndex);
 
                 
 
-                shapes.add(shapeIndex, newShape);
-                //value = newValue;
-                System.out.println("Redo: update shape newShape: "+ newShape);
-                System.out.println("Redo: update shape oldShape: "+ oldShape);
-                updateViews();
-            }
+        //         shapes.add(shapeIndex, newShape);
+        //         //value = newValue;
+        //         System.out.println("Redo: update shape newShape: "+ newShape);
+        //         System.out.println("Redo: update shape oldShape: "+ oldShape);
+        //         updateViews();
+        //     }
 
-        };
+        // };
         
         // Add this undoable edit to the undo manager
-        undoManager.addEdit(undoableEdit);
+        // undoManager.addEdit(undoableEdit);
         shape = getNewShape(shape, tmp);
         //shape.updateShape(endPoint)
         
@@ -94,6 +92,35 @@ public class DrawingModel extends Observable {
     public ShapeModel getNewShape(ShapeModel shape, Shape tmp){
         shape.shape = tmp;
         return shape;
+    }
+
+    public void addDuplicate(){
+        for(ShapeModel shape : this.shapes) {
+            if (shape.isSelected) {
+                int newStartX= shape.startPoint.x + 10;
+                int newStartY= shape.startPoint.y + 10;
+                Point newStartPoint = new Point(newStartX, newStartY);
+
+                int newEndX= shape.endPoint.x + 10;
+                int newEndY= shape.endPoint.y + 10;
+                Point newEndPoint = new Point(newEndX, newEndY);
+                ShapeModel newShape = new ShapeModel.ShapeFactory().getShape(shape.myShapeType, newStartPoint, newEndPoint);
+                this.addShapeField(newShape, newStartPoint, newEndPoint);
+                this.shapes.add(newShape);
+                shape.isSelected = false;
+                newShape.isSelected = true;
+                updateViews();
+                return;
+            }
+
+        } 
+        
+    }
+
+    public void addShapeField(ShapeModel shape, Point startPoint, Point endPoint){
+        shape.myShapeType = this.getShape();
+        shape.startPoint = startPoint;
+        shape.endPoint = endPoint;
     }
 
     public void addShape(ShapeModel shape) {
@@ -114,7 +141,7 @@ public class DrawingModel extends Observable {
                 super.redo();
                 shapes.add(newShape);
                 //value = newValue;
-                System.out.println("Model: redo value to "+ newShape);
+                // System.out.println("Model: redo value to "+ newShape);
                 updateViews();
             }
 
@@ -123,7 +150,7 @@ public class DrawingModel extends Observable {
                 shapes.remove(newShape);
                 //shapes.remove(shapes.size() - 1);
                 //value = oldValue;
-                System.out.println("Model: undo value to "+ newShape);
+                // System.out.println("Model: undo value to "+ newShape);
                 updateViews();
             }
         };

@@ -29,18 +29,19 @@ public class ToolbarView extends JToolBar implements Observer {
             add(button);
         }
 
+        duplicate.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent event) {
+                model.addDuplicate();
+            }
+        });
+
         // controllers for undo menu item
         undo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
-                // if (!model.shapes.isEmpty()) {
-
-                //     model.shapes.remove(model.shapes.size() - 1);
-                //     repaint();
-
-                // }
                 model.undo();
             }
         });
+
         // controller for redo menu item
         redo.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent event) {
