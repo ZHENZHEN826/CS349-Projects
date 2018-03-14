@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.geom.*;
 import java.awt.geom.Point2D;
 import java.lang.reflect.Constructor;
 
@@ -9,13 +10,15 @@ public class ShapeModel {
     Shape shape;
     ShapeType myShapeType;
 
+    // Point when create, never change
+    // For transformation
     Point startPoint;
     Point endPoint;
 
     // absolute position of the shape
      int absX ;
      int absY ;
-    Point absStartPonit;
+    Point absStartPoint;
     Point absEndPoint;
 
     // position before dragged
@@ -28,7 +31,10 @@ public class ShapeModel {
     boolean isSelected = true;
 
     int handleSize = 5;
-    double scale = 1.0;
+
+    double absScaleX = 1.0;
+    double absScaleY = 1.0;
+    double pScale = 1.0;
     // translation
     // rotation
 
@@ -61,7 +67,6 @@ public class ShapeModel {
     // }
 
     public boolean onBottomCorner(int x, int y) {
-        System.out.println("onBottomCorner ~");
         return Math.abs(x - (boundingX + boundingWidth)) < handleSize
                  && Math.abs(y - (boundingY + boundingHeight)) < handleSize;
         // return Math.abs(fromX(x) - this.model.getBase()) < handleSize
@@ -70,12 +75,14 @@ public class ShapeModel {
 
     public Shape getShape() {
         // For printing, do all transformation here
-        
+
         // // affinetransformation to translate
-        // AffineTransform t = new AffineTransform();
         // t.translate(absX, absY);
         // // create translated shape 
-        // return t.createTransformedShape(rect);
+
+        // AffineTransform t = new AffineTransform();
+        // t.scale(absScaleX, absScaleY);
+        // return t.createTransformedShape(shape);
 
         return shape;
     }

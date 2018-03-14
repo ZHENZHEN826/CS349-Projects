@@ -68,7 +68,7 @@ public class CanvasView extends JPanel implements Observer {
                 lastY = e.getY();
 
                 for(ShapeModel shape : model.getShapes()) {
-                    if (shape.onBottomCorner(lastX, lastY) && shape.isSelected){
+                    if (shape.onBottomCorner(lastX, lastY ) && shape.isSelected){
                         // Scale handle selected
                         shape.scaleSelected = true;
                     } 
@@ -82,7 +82,7 @@ public class CanvasView extends JPanel implements Observer {
                     else {
                         shape.isSelected = false;
                     }
-                    System.out.println("scale: "+ shape.scaleSelected + "translate: "+ shape.translateSelected + "selected"+ shape.isSelected);
+                    System.out.println("scale: "+ shape.scaleSelected + " translate: "+ shape.translateSelected + " selected: "+ shape.isSelected);
                 }
                 repaint();
             }
@@ -94,8 +94,6 @@ public class CanvasView extends JPanel implements Observer {
 
                 lastMouse = e.getPoint();
 
-                lastX = e.getX();
-                lastY = e.getY();
 
                 for(ShapeModel shape : model.getShapes()) {
                     if (shape.scaleSelected) {
@@ -103,11 +101,26 @@ public class CanvasView extends JPanel implements Observer {
                         drawing = false;
                         //shape.updateShape((Point) lastMouse);
                         model.updateShape(shape, shape.startPoint ,(Point) lastMouse);
+                        //model.scale(shape, (Point)lastMouse);
                         break;
                     } 
                     else if (shape.translateSelected){
                         moving = true;
                         drawing = false;
+
+                        int xChange = e.getX() - lastX;
+                        int yChange = e.getY() - lastY;
+
+                        int newStartX= shape.startPoint.x + xChange;
+                        int newStartY= shape.startPoint.y + yChange;
+                        Point newStartPoint = new Point(newStartX, newStartY);
+
+                        int newEndX= shape.endPoint.x + xChange;
+                        int newEndY= shape.endPoint.y + yChange;
+                        Point newEndPoint = new Point(newEndX, newEndY);
+
+
+                        model.updateShape(shape, newStartPoint, newEndPoint);
                         // int xChange = (int)lastMouse.getX() - (int)startMouse.getX();
                         // int yChange = (int)lastMouse.getY() - (int)startMouse.getY();
 
@@ -121,8 +134,11 @@ public class CanvasView extends JPanel implements Observer {
 
                         // model.updateShape(shape, newStartPoint, newEndPoint);
 
-                        // model.translate(e.getX() - lastX, e.getY() - lastY);
-                        // moving = true;
+                        // model.translate(shape, e.getX() - lastX, e.getY() - lastY);
+
+                        lastX = e.getX();
+                        lastY = e.getY();
+
                         break;
                     }
                     else if (shape.rotateSelected){
@@ -132,7 +148,7 @@ public class CanvasView extends JPanel implements Observer {
                         break;
                     } 
                 }
-                
+
                 repaint();
             }
 
@@ -156,6 +172,12 @@ public class CanvasView extends JPanel implements Observer {
                     ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
                     model.addShape(shape);
                     model.addShapeField(shape, (Point) startMouse, (Point) lastMouse);
+                }
+
+                for(ShapeModel shape : model.getShapes()) {
+                    shape.scaleSelected = false;
+                    shape.translateSelected = false;
+                    shape.rotateSelected = false;
                 }
 
                 startMouse = null;

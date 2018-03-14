@@ -39,14 +39,42 @@ public class DrawingModel extends Observable {
     // public List<ShapeModel> getReverseShapes() {
     //     return Collections.reverse(shapes.clone());
     // }
+    public double diagonal (int x, int y){
+        return Math.sqrt(x * x + y * y);
+    }
+    public void scale(ShapeModel shape, Point lastMouse){
+        double x = lastMouse.getX();
+        double y = lastMouse.getY();
 
+        // Point at top left corner
+        Point topLeft = shape.absStartPoint;
+        Point bottomRight = shape.absEndPoint;
+        double oldWidth = bottomRight.getX() - topLeft.getX();
+        double newWidth = x - topLeft.getX();
+
+        double oldHeight = bottomRight.getY() - topLeft.getY();
+        double newHeight = y - topLeft.getY();
+
+        shape.absScaleX = oldWidth/newWidth;
+        shape.absScaleX = oldHeight/newHeight;
+
+        updateViews();
+    }
+
+    public void endScale(ShapeModel shape){
+
+    }
     public void translate(ShapeModel shape, int dx, int dy){
         shape.absX += dx;
         shape.absY += dy;
         updateViews();
     }
 
-    public void endEdit(ShapeModel shape){
+    public void translateShape(ShapeModel shape, Point startPoint, Point endPoint){
+
+    }
+
+    public void endTranslate(ShapeModel shape){
         recUndoable = new RectUndoable(shape, shape.pX, shape.pY, shape.absX, shape.absY);
         undoManager.addEdit(recUndoable);
         shape.pX = shape.absX;
@@ -135,6 +163,9 @@ public class DrawingModel extends Observable {
         shape.myShapeType = this.getShape();
         shape.startPoint = startPoint;
         shape.endPoint = endPoint;
+
+        shape.absStartPoint = startPoint;
+        shape.absEndPoint = endPoint;
     }
 
     public void addShape(ShapeModel shape) {
