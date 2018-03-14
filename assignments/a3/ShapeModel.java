@@ -11,6 +11,19 @@ public class ShapeModel {
 
     Point startPoint;
     Point endPoint;
+
+    // absolute position of the shape
+     int absX ;
+     int absY ;
+    Point absStartPonit;
+    Point absEndPoint;
+
+    // position before dragged
+     int pX ;
+     int pY ;
+    Point pStartPoint;
+    Point pEndPoint;
+
     // Point2D mousePosition;
     boolean isSelected = true;
 
@@ -23,7 +36,8 @@ public class ShapeModel {
     int boundingHeight, boundingWidth, boundingX, boundingY;
 
     boolean scaleSelected = false;
-    
+    boolean translateSelected = false;
+    boolean rotateSelected = false;
 
     public ShapeModel(Point startPoint, Point endPoint) {}
 
@@ -55,6 +69,14 @@ public class ShapeModel {
     }
 
     public Shape getShape() {
+        // For printing, do all transformation here
+        
+        // // affinetransformation to translate
+        // AffineTransform t = new AffineTransform();
+        // t.translate(absX, absY);
+        // // create translated shape 
+        // return t.createTransformedShape(rect);
+
         return shape;
     }
 
@@ -63,7 +85,7 @@ public class ShapeModel {
         return this.getShape().contains(p);
     }
 
-    public Shape updateShape(Point endPoint) {
+    public Shape updateShape(Point startPoint, Point endPoint) {
         return shape;
     }
 

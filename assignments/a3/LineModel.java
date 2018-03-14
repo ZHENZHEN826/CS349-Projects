@@ -6,13 +6,13 @@ public class LineModel extends ShapeModel {
 
     Point a;
     Point b;
-    Point oldStartPoint;
+    // Point oldStartPoint;
 
     public LineModel(Point startPoint, Point endPoint) {
         super(startPoint, endPoint);
         this.a = startPoint;
         this.b = endPoint;
-        this.oldStartPoint = startPoint;
+        // this.oldStartPoint = startPoint;
 
         Path2D path = new Path2D.Double();
         path.moveTo(startPoint.x, startPoint.y);
@@ -31,12 +31,12 @@ public class LineModel extends ShapeModel {
     }
 
     @Override
-    public Shape updateShape(Point endPoint) {
-        this.a = oldStartPoint;
+    public Shape updateShape(Point startPoint, Point endPoint) {
+        this.a = startPoint;
         this.b = endPoint;
 
         Path2D path = new Path2D.Double();
-        path.moveTo(oldStartPoint.x, oldStartPoint.y);
+        path.moveTo(startPoint.x, startPoint.y);
         path.lineTo(endPoint.x, endPoint.y);
         return path;
 

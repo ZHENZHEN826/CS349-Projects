@@ -40,12 +40,27 @@ public class DrawingModel extends Observable {
     //     return Collections.reverse(shapes.clone());
     // }
 
-    public void updateShape(ShapeModel shape, Point endPoint) {
+    public void translate(ShapeModel shape, int dx, int dy){
+        shape.absX += dx;
+        shape.absY += dy;
+        updateViews();
+    }
+
+    public void endEdit(ShapeModel shape){
+        recUndoable = new RectUndoable(shape, shape.pX, shape.pY, shape.absX, shape.absY);
+        undoManager.addEdit(recUndoable);
+        shape.pX = shape.absX;
+        shape.pY = shape.absY;
+    }
+
+    public void updateShape(ShapeModel shape, Point startPoint, Point endPoint) {
         // ShapeModel oldShape = shape;
 
         // int shapeIndex = shapes.indexOf(oldShape);
 
-        Shape tmp = shape.updateShape(endPoint);
+        Shape tmp = shape.updateShape(startPoint, endPoint);
+        shape.startPoint = startPoint;
+        shape.endPoint = endPoint;
         //     //final ShapeModel newShape = shape.shape=;
         // ShapeModel newShape = getNewShape(shape, tmp);
 
@@ -101,8 +116,8 @@ public class DrawingModel extends Observable {
                 int newStartY= shape.startPoint.y + 10;
                 Point newStartPoint = new Point(newStartX, newStartY);
 
-                int newEndX= shape.endPoint.x + 10;
-                int newEndY= shape.endPoint.y + 10;
+                int newEndX = shape.endPoint.x + 10;
+                int newEndY = shape.endPoint.y + 10;
                 Point newEndPoint = new Point(newEndX, newEndY);
                 ShapeModel newShape = new ShapeModel.ShapeFactory().getShape(shape.myShapeType, newStartPoint, newEndPoint);
                 this.addShapeField(newShape, newStartPoint, newEndPoint);
@@ -112,7 +127,6 @@ public class DrawingModel extends Observable {
                 updateViews();
                 return;
             }
-
         } 
         
     }
@@ -124,13 +138,7 @@ public class DrawingModel extends Observable {
     }
 
     public void addShape(ShapeModel shape) {
-        // recUndoable = new RectUndoable(pX, pY, absX, absY);
-        // undoManager.addEdit(recUndoable);
-        
-
         UndoableEdit undoableEdit = new AbstractUndoableEdit() {
-
-            // capture variables for closure
             // final int oldValue = value;
             // final int newValue = v;
             final ShapeModel newShape = shape;
@@ -157,9 +165,7 @@ public class DrawingModel extends Observable {
         
         // Add this undoable edit to the undo manager
         undoManager.addEdit(undoableEdit);
-
         this.shapes.add(shape);
-        
         updateViews();
     }
 
@@ -174,8 +180,11 @@ public class DrawingModel extends Observable {
         public int n_translateX = 0;
         public int n_translateY = 0;
 
+        public ShapeModel shape;
 
-        public RectUndoable(int px, int py, int x, int y){
+
+        public RectUndoable(ShapeModel shape, int px, int py, int x, int y){
+            shape = shape;
             // position for undo
             p_translateX = px;
             p_translateY = py;
@@ -187,31 +196,21 @@ public class DrawingModel extends Observable {
 
         public void undo() throws CannotRedoException {
             super.undo();
-            // absX = p_translateX;
-            // absY = p_translateY;
+            shape.absX = p_translateX;
+            shape.absY = p_translateY;
             // System.out.println("Model: undo location to " + absX + "," + absY);
             updateViews();
         }
 
         public void redo() throws CannotRedoException {
             super.redo();
-            // absX = n_translateX;
-            // absY = n_translateY;
+            shape.absX = n_translateX;
+            shape.absY = n_translateY;
             // System.out.println("Model: redo location to " + absX + "," + absY);
             updateViews();
         }
 
     }
-
-    // public void undo() {
-    //     if (canUndo())
-    //         undoManager.undo();
-    // }
-
-    // public void redo() {
-    //     if (canRedo())
-    //         undoManager.redo();
-    // }
 
     public void undo(){
         if(undoManager.canUndo()){
