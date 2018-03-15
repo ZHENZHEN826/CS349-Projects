@@ -8,6 +8,7 @@ All the source code demonstrated during lectures will be posted to this reposito
 
 * [X Windows](x/)
 * [Java](java/)
+* [Android](android/)
 
 ---
 

@@ -1,6 +1,7 @@
 import java.awt.*;
 import java.awt.geom.*;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.lang.reflect.Constructor;
 
 import java.awt.event.MouseAdapter;
@@ -14,12 +15,15 @@ public class ShapeModel {
     // For transformation
     Point startPoint;
     Point endPoint;
+    Point centerPoint = null;
 
     // absolute position of the shape
      int absX ;
      int absY ;
     Point absStartPoint;
     Point absEndPoint;
+
+    Point absCenterPoint;
 
     // position before dragged
      int pX ;
@@ -37,6 +41,7 @@ public class ShapeModel {
     double pScale = 1.0;
     // translation
     // rotation
+    double radians;
 
     Rectangle boundingBox;// = shape.getBounds2D();
     int boundingHeight, boundingWidth, boundingX, boundingY;
@@ -48,7 +53,13 @@ public class ShapeModel {
     public ShapeModel(Point startPoint, Point endPoint) {}
 
     public void setBoundingBox(){
+        // AffineTransform t = new AffineTransform();
+        // t.translate(absX, absY);
+        // Shape newShape = t.createTransformedShape(shape);
+
+        // boundingBox = newShape.getBounds();
         boundingBox = shape.getBounds();
+
         boundingHeight = boundingBox.height;
         boundingWidth = boundingBox.width;
         boundingX = boundingBox.x;
@@ -66,25 +77,71 @@ public class ShapeModel {
     //             / this.scale;
     // }
 
+    public Point transformOnePoint (int x, int y){
+        // hit testing
+        Point M = new Point(x, y);
+        Point MT = new Point();
+        // create transformation matrix for this shape
+        AffineTransform AT1;
+        AT1 = new AffineTransform();
+
+        AT1.translate(absX, absY);
+        AT1.translate(centerPoint.x, centerPoint.y);
+        AT1.rotate(radians);
+        AT1.translate(-centerPoint.x, -centerPoint.y);
+        // create an inverse matrix of AT1
+        try{
+            // create an inverse matrix of AT1
+            AffineTransform IAT1 = AT1.createInverse();
+            // apply the inverse transformation to the handle position
+            IAT1.transform(M, MT);
+            // Hit test with transformed handle position
+            
+        } catch (NoninvertibleTransformException e){
+            // error
+        }     
+        // double calX = MT.x;
+        // double calY = MT.y;
+        return MT;
+    }
     public boolean onBottomCorner(int x, int y) {
-        return Math.abs(x - (boundingX + boundingWidth)) < handleSize
-                 && Math.abs(y - (boundingY + boundingHeight)) < handleSize;
+        Point MT = transformOnePoint (x, y);
+        int calX = MT.x;
+        int calY = MT.y;
+        return Math.abs(calX - (boundingX + boundingWidth)) < handleSize
+                 && Math.abs(calY - (boundingY + boundingHeight)) < handleSize;
         // return Math.abs(fromX(x) - this.model.getBase()) < handleSize
         //         && Math.abs(fromY(y) - this.model.getHeight()) < handleSize;
+    }
+
+    public boolean onRotateHandle(int x, int y){
+        Point MT = transformOnePoint (x, y);
+        int calX = MT.x;
+        int calY = MT.y;
+        return Math.abs(calX - (boundingX + boundingWidth/2 )) < handleSize
+                && Math.abs(calY - (boundingY - 10)) < handleSize;
     }
 
     public Shape getShape() {
         // For printing, do all transformation here
 
-        // // affinetransformation to translate
-        // t.translate(absX, absY);
+        // affinetransformation to translate
+        AffineTransform t = new AffineTransform();
+        //t.translate(absX, absY);
+        if (centerPoint != null){
+            t.translate(absX, absY);
+            t.translate(centerPoint.getX(), centerPoint.getY());
+            t.rotate(radians);
+            t.translate(-centerPoint.getX(), -centerPoint.getY());
+        }
+        
         // // create translated shape 
 
-        // AffineTransform t = new AffineTransform();
+        
         // t.scale(absScaleX, absScaleY);
-        // return t.createTransformedShape(shape);
+        return t.createTransformedShape(shape);
 
-        return shape;
+        // return shape;
     }
 
     // You will need to change the hittest to account for transformations.

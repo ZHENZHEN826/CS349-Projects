@@ -1,8 +1,10 @@
 import java.util.*;
 import java.util.List;
 import java.awt.*;
+
 // import java.awt.Point;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -42,6 +44,49 @@ public class DrawingModel extends Observable {
     public double diagonal (int x, int y){
         return Math.sqrt(x * x + y * y);
     }
+
+    public double findRadians(double x, double y){
+
+        if ((x > 0) && (y < 0)){
+            // 1st quadrant
+            return Math.toRadians(90.0) - Math.atan(Math.abs(y) / x);
+        } else if ((x > 0) && (y > 0)) {
+            // 2nd quadrant
+            return Math.toRadians(90.0) + Math.atan(y / x);
+        } else if ((x < 0) && (y > 0)) {
+            // 3rd quadrant
+            return Math.toRadians(270.0) - Math.atan(y / Math.abs(x));
+        } else if ((x < 0) && (y < 0)) {
+            // 4th quadrant
+            return Math.toRadians(270.0) + Math.atan(Math.abs(y) / Math.abs(x));
+        } else {
+            System.out.println("findRadians: what's this case?"+ x + " " + y);
+            return 0.0;
+        }
+    }
+
+    public void rotate(ShapeModel shape, Point lastMouse){
+        // transfer the center point of the shape to origin, get the transformed lastMouse Position
+        
+        System.out.println("centerPoint "+ shape.centerPoint);
+        System.out.println("lastmouse" + lastMouse);
+
+        Point ptDst = new Point(lastMouse.x, lastMouse.y);
+        ptDst.translate(-shape.centerPoint.x, -shape.centerPoint.y);
+
+        // determine degree of rotation
+        System.out.println("ptDst" + ptDst);
+        double x = ptDst.getX();
+        double y = ptDst.getY();
+        double radians = findRadians(x, y);
+        System.out.println("Degrees" + Math.toDegrees(radians));
+        // save the degree
+        if (x !=0 || y != 0){
+            shape.radians = radians;
+        }
+
+    }
+
     public void scale(ShapeModel shape, Point lastMouse){
         double x = lastMouse.getX();
         double y = lastMouse.getY();
@@ -67,11 +112,9 @@ public class DrawingModel extends Observable {
     public void translate(ShapeModel shape, int dx, int dy){
         shape.absX += dx;
         shape.absY += dy;
+        // shape.centerPoint.x += dx;
+        // shape.centerPoint.y += dy;
         updateViews();
-    }
-
-    public void translateShape(ShapeModel shape, Point startPoint, Point endPoint){
-
     }
 
     public void endTranslate(ShapeModel shape){
@@ -150,12 +193,18 @@ public class DrawingModel extends Observable {
                 ShapeModel newShape = new ShapeModel.ShapeFactory().getShape(shape.myShapeType, newStartPoint, newEndPoint);
                 this.addShapeField(newShape, newStartPoint, newEndPoint);
                 this.shapes.add(newShape);
+
                 shape.isSelected = false;
                 newShape.isSelected = true;
+
                 updateViews();
-                return;
+                break;
             }
         } 
+        // unselect 
+        for (int i =0; i < shapes.size() - 1; i++){
+            shapes.get(i).isSelected = false;
+        }
         
     }
 
@@ -166,6 +215,7 @@ public class DrawingModel extends Observable {
 
         shape.absStartPoint = startPoint;
         shape.absEndPoint = endPoint;
+        shape.centerPoint = new Point((startPoint.x+endPoint.x)/2, (startPoint.y + endPoint.y)/2);
     }
 
     public void addShape(ShapeModel shape) {

@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.geom.AffineTransform;
 import java.util.*;
 // import java.util.Observable;
 // import java.util.Observer;
@@ -76,9 +77,10 @@ public class CanvasView extends JPanel implements Observer {
                         // To translate - shape must already selected and press inside the shape
                         shape.translateSelected = true;
                     } 
-                    // else if (shape.onRotateHandle() && shape.isSelected){
-                    //     shape.rotateSelected = true;
-                    // }
+                    else if (shape.onRotateHandle(lastX, lastY) && shape.isSelected){
+                        shape.rotateSelected = true;
+                        System.out.println("On rotate handler!");
+                    }
                     else {
                         shape.isSelected = false;
                     }
@@ -108,21 +110,8 @@ public class CanvasView extends JPanel implements Observer {
                         moving = true;
                         drawing = false;
 
-                        int xChange = e.getX() - lastX;
-                        int yChange = e.getY() - lastY;
-
-                        int newStartX= shape.startPoint.x + xChange;
-                        int newStartY= shape.startPoint.y + yChange;
-                        Point newStartPoint = new Point(newStartX, newStartY);
-
-                        int newEndX= shape.endPoint.x + xChange;
-                        int newEndY= shape.endPoint.y + yChange;
-                        Point newEndPoint = new Point(newEndX, newEndY);
-
-
-                        model.updateShape(shape, newStartPoint, newEndPoint);
-                        // int xChange = (int)lastMouse.getX() - (int)startMouse.getX();
-                        // int yChange = (int)lastMouse.getY() - (int)startMouse.getY();
+                        // int xChange = e.getX() - lastX;
+                        // int yChange = e.getY() - lastY;
 
                         // int newStartX= shape.startPoint.x + xChange;
                         // int newStartY= shape.startPoint.y + yChange;
@@ -132,9 +121,11 @@ public class CanvasView extends JPanel implements Observer {
                         // int newEndY= shape.endPoint.y + yChange;
                         // Point newEndPoint = new Point(newEndX, newEndY);
 
-                        // model.updateShape(shape, newStartPoint, newEndPoint);
 
-                        // model.translate(shape, e.getX() - lastX, e.getY() - lastY);
+                        // model.updateShape(shape, newStartPoint, newEndPoint);
+               
+
+                        model.translate(shape, e.getX() - lastX, e.getY() - lastY);
 
                         lastX = e.getX();
                         lastY = e.getY();
@@ -144,7 +135,7 @@ public class CanvasView extends JPanel implements Observer {
                     else if (shape.rotateSelected){
                         rotating = true;
                         drawing = false;
-                        // update some stuff
+                        model.rotate(shape, (Point)lastMouse);
                         break;
                     } 
                 }
@@ -156,14 +147,15 @@ public class CanvasView extends JPanel implements Observer {
             public void mouseReleased(MouseEvent e) {
                 // store transformation info for printing, undoing/redoing
                 super.mouseReleased(e);
-                if (scaling) {
+                // if (scaling) {
 
-                } else if (moving){
-                    //model.endEdit();
-                    //needStore = false;
-                } else if (rotating) {
+                // } else if (moving){
+                //     //model.endTranslate();
+                //     //needStore = false;
+                // } else if (rotating) {
 
-                } else if (drawing){
+                // } else 
+                if (drawing){
                     // // When draw a new shape, unselect all the other shapes
                     // for(ShapeModel shape : model.getShapes()) {
                     //     shape.isSelected = false;
@@ -175,6 +167,13 @@ public class CanvasView extends JPanel implements Observer {
                 }
 
                 for(ShapeModel shape : model.getShapes()) {
+                    if (shape.scaleSelected){
+
+                    } else if (shape.translateSelected){
+                        model.endTranslate(shape);
+                    } else if (shape.rotateSelected){
+
+                    }
                     shape.scaleSelected = false;
                     shape.translateSelected = false;
                     shape.rotateSelected = false;
@@ -220,15 +219,24 @@ public class CanvasView extends JPanel implements Observer {
             g2.draw(shape.getShape());
             if (shape.isSelected){
                 // Draw scale handles
+                AffineTransform save = g2.getTransform();
+
+                g2.translate(shape.absX, shape.absY);
+                g2.translate(shape.centerPoint.getX(), shape.centerPoint.getY());
+                g2.rotate(shape.radians);
+                g2.translate(-shape.centerPoint.getX(), -shape.centerPoint.getY());
+
                 shape.setBoundingBox();
                 int x = shape.boundingX + shape.boundingWidth;
                 int y = shape.boundingY + shape.boundingHeight;
-                g2.fillRect(x - 5, y - 5, 10, 10);
+
+                g2.fillRect(x - shape.handleSize, y - shape.handleSize, 2*shape.handleSize, 2*shape.handleSize);
                 // Draw rotation handles
                 x = shape.boundingX + (shape.boundingWidth/2);
                 y = shape.boundingY - 10;
-                g2.fillOval(x - 5 , y - 5, 10, 10);
+                g2.fillOval(x - shape.handleSize , y - shape.handleSize, 2*shape.handleSize, 2*shape.handleSize);
                 System.out.println("Draw two dots!");
+                g2.setTransform(save);
             }
 
         }
