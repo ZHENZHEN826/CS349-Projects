@@ -1,0 +1,1 @@
+Enhancement: Support single-axis(X-axis) scaling with an additional rectangle handle on the right side of the shape.

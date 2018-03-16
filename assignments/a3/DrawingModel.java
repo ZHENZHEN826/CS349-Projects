@@ -1,13 +1,11 @@
 import java.util.*;
 import java.util.List;
 import java.awt.*;
-
 // import java.awt.Point;
 import java.awt.geom.Point2D;
 import java.awt.geom.AffineTransform;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import javax.swing.undo.*;
 
 public class DrawingModel extends Observable {
@@ -18,6 +16,7 @@ public class DrawingModel extends Observable {
     UndoManager undoManager = new UndoManager();
     TranslateUndoable translateUndoable;
     ScaleUndoable scaleUndoable;
+    ScaleXUndoable scaleXUndoable;
     RotateUndoable rotateUndoable;
 
 
@@ -80,6 +79,35 @@ public class DrawingModel extends Observable {
 
     }
 
+    public void scaleX(ShapeModel shape, Point lastMouse){
+        // Point at top left corner
+        Point2D topLeft = shape.staticStartPoint;
+        Point2D bottomRight = shape.staticEndPoint;
+        
+        Point ptSrc = new Point(lastMouse.x, lastMouse.y);
+        Point ptDst = new Point();
+
+        AffineTransform AT1;
+        AT1 = new AffineTransform();
+        
+        AT1.translate(shape.centerPoint.getX(), shape.centerPoint.getY());
+        AT1.scale(1/shape.absScaleX, 1/shape.absScaleY);
+        AT1.rotate(-shape.radians);
+        AT1.translate(-shape.centerPoint.getX(), -shape.centerPoint.getY());
+        AT1.transform(ptSrc, ptDst);
+
+        double x = ptDst.getX();
+        double y = ptDst.getY();
+
+        double oldWidth = bottomRight.getX() - topLeft.getX();
+        double z1 = topLeft.getX()+bottomRight.getX()-x;
+        double newWidth = x - z1;
+
+        shape.absScaleOnX = newWidth/oldWidth;
+
+        updateViews();
+    }
+
     public void scale(ShapeModel shape, Point lastMouse){
         // Point at top left corner
         Point2D topLeft = shape.staticStartPoint;
@@ -92,6 +120,7 @@ public class DrawingModel extends Observable {
         AT1 = new AffineTransform();
         
         AT1.translate(shape.centerPoint.getX(), shape.centerPoint.getY());
+        AT1.scale(1/shape.absScaleOnX, 1);
         AT1.rotate(-shape.radians);
         AT1.translate(-shape.centerPoint.getX(), -shape.centerPoint.getY());
         AT1.transform(ptSrc, ptDst);
@@ -156,6 +185,9 @@ public class DrawingModel extends Observable {
         public void undo() throws CannotRedoException {
             super.undo();
             this.shape.radians = p_radian;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: undo rotate to " + shape.radians);
             updateViews();
@@ -164,6 +196,9 @@ public class DrawingModel extends Observable {
         public void redo() throws CannotRedoException {
             super.redo();
             this.shape.radians = n_radian;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: redo rotate to " + shape.radians);
             updateViews();
@@ -203,6 +238,9 @@ public class DrawingModel extends Observable {
             super.undo();
             this.shape.absScaleX = p_scaleX;
             this.shape.absScaleY = p_scaleY;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
@@ -212,6 +250,58 @@ public class DrawingModel extends Observable {
             super.redo();
             this.shape.absScaleX = n_scaleX;
             this.shape.absScaleY = n_scaleY;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
+            this.shape.isSelected = true;
+            System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            updateViews();
+        }
+
+    }
+
+    public void endScaleX(ShapeModel shape){
+        scaleXUndoable = new ScaleXUndoable(shape, shape.pScaleOnX, shape.absScaleOnX);
+        undoManager.addEdit(scaleXUndoable);
+        shape.pScaleOnX = shape.absScaleOnX;
+    }
+
+    public class ScaleXUndoable extends AbstractUndoableEdit{
+        // position for undo
+        public double p_scaleX = 0;
+        public double p_scaleY = 0;
+
+        // position for redo
+        public double n_scaleX = 0;
+        public double n_scaleY = 0;
+
+        public ShapeModel shape;
+
+        public ScaleXUndoable(ShapeModel shape, double px,double x){
+            this.shape = shape;
+            // position for undo
+            p_scaleX = px;
+            // position for redo
+            n_scaleX = x;
+        }
+
+        public void undo() throws CannotRedoException {
+            super.undo();
+            this.shape.absScaleOnX = p_scaleX;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
+            this.shape.isSelected = true;
+            System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            updateViews();
+        }
+
+        public void redo() throws CannotRedoException {
+            super.redo();
+            this.shape.absScaleOnX = n_scaleX;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
@@ -251,6 +341,9 @@ public class DrawingModel extends Observable {
             super.undo();
             this.shape.absX = p_translateX;
             this.shape.absY = p_translateY;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: undo location to " + shape.absX + "," + shape.absY);
             updateViews();
@@ -260,6 +353,9 @@ public class DrawingModel extends Observable {
             super.redo();
             this.shape.absX = n_translateX;
             this.shape.absY = n_translateY;
+            for(ShapeModel shape : getShapes()) {
+                shape.isSelected = false;
+            }
             this.shape.isSelected = true;
             System.out.println("Model: redo location to " + shape.absX + "," + shape.absY);
             updateViews();
@@ -402,28 +498,18 @@ public class DrawingModel extends Observable {
         shape.staticEndPoint = endPoint;
         shape.staticCenterPoint = new Point((startPoint.x+endPoint.x)/2, (startPoint.y + endPoint.y)/2);
 
-        // shape.absX = 0;
-        // shape.absY = 0;
-        // shape.pX = 0;
-        // shape.pY = 0;
-
         shape.setBoundingBox();
     }
 
     public void addShape(ShapeModel shape) {
         UndoableEdit undoableEdit = new AbstractUndoableEdit() {
-            // final int oldValue = value;
-            // final int newValue = v;
             final ShapeModel newShape = shape;
-            //final ShapeModel oldShape = shapes.get(shapes.size() - 1);
 
             // Method that is called when we must redo the undone action
             public void redo() throws CannotRedoException {
                 super.redo();
                 shapes.add(newShape);
                 newShape.isSelected = true;
-                //value = newValue;
-                // System.out.println("Model: redo value to "+ newShape);
                 updateViews();
             }
 
@@ -433,9 +519,6 @@ public class DrawingModel extends Observable {
                 for(ShapeModel shape : getShapes()) {
                     shape.isSelected = false;
                 }
-                //shapes.remove(shapes.size() - 1);
-                //value = oldValue;
-                // System.out.println("Model: undo value to "+ newShape);
                 updateViews();
             }
         };
@@ -446,8 +529,6 @@ public class DrawingModel extends Observable {
         updateViews();
     }
 
-
-    
 
     public void undo(){
         if(undoManager.canUndo()){

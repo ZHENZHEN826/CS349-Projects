@@ -2,8 +2,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.geom.Point2D;
-import java.awt.geom.AffineTransform;
+import java.awt.geom.*;
+// import java.awt.geom.Point2D;
+// import java.awt.geom.AffineTransform;
 import java.util.*;
 // import java.util.Observable;
 // import java.util.Observer;
@@ -18,14 +19,11 @@ public class CanvasView extends JPanel implements Observer {
     int lastX, lastY;
 
     boolean scaling = false;
+    boolean scalingX = false;
     boolean moving = false;
     boolean rotating = false;
     boolean drawing = true;
-
-    boolean needStore = false;
-
    
-
     public CanvasView(DrawingModel model) {
         super();
         this.model = model;
@@ -42,10 +40,8 @@ public class CanvasView extends JPanel implements Observer {
                 // After one shape is selected, unselect all the other shapes 
                 boolean setRestUnselected = false;
 
-                // System.out.println("Shapes size: " + model.getShapes().size());
                 // Go through the shape list and do hit test
                 for(ShapeModel shape : model.getShapes()) {
-                    // System.out.println("mouse click centerPoint1" + shape.centerPoint);
                     if (setRestUnselected){
                         shape.isSelected = false;
                     } else if (shape.hitTest(clickPosition)){
@@ -54,7 +50,6 @@ public class CanvasView extends JPanel implements Observer {
                     } else {
                         shape.isSelected = false;
                     }
-                    // System.out.println("mouse click centerPoint2" + shape.centerPoint);
                 }
                 repaint();
             }
@@ -76,22 +71,24 @@ public class CanvasView extends JPanel implements Observer {
 
                 for(ShapeModel shape : model.getShapes()) {
                     if (shape.onBottomCorner(startMouse.getX(), startMouse.getY()) && shape.isSelected){
-                        // System.out.println("On scale handler!");
                         // Scale handle selected
                         shape.scaleSelected = true;
                     } 
                     else if (shape.onRotateHandle(startMouse.getX(), startMouse.getY()) && shape.isSelected){
+                        // Rotate handle selected
                         shape.rotateSelected = true;
-                        // System.out.println("On rotate handler!");
+                    }
+                    else if (shape.onScaliingHandleX(startMouse.getX(), startMouse.getY()) && shape.isSelected){
+                        // X-axis scale handle selected
+                        shape.scaleXSelected = true;
                     }
                     else if (shape.hitTest(startMouse) && shape.isSelected) {
                         // To translate - shape must already selected and press inside the shape
                         shape.translateSelected = true;
-                    } 
+                    }  
                     else {
                         shape.isSelected = false;
                     }
-                    // System.out.println("scale: "+ shape.scaleSelected + " translate: "+ shape.translateSelected + " selected: "+ shape.isSelected);
                 }
                 repaint();
             }
@@ -130,7 +127,12 @@ public class CanvasView extends JPanel implements Observer {
 
                         model.rotate(shape, (Point)lastMouse);
                         break;
-                    } 
+                    } else if (shape.scaleXSelected){
+                        scalingX = true;
+                        drawing = false;
+
+                        model.scaleX(shape, (Point)lastMouse);
+                    }
                 }
 
                 repaint();
@@ -157,8 +159,11 @@ public class CanvasView extends JPanel implements Observer {
                         model.endTranslate(shape);
                     } else if (shape.rotateSelected){
                         model.endRotate(shape);
+                    } else if (shape.scaleXSelected){
+                        model.endScaleX(shape);
                     }
                     shape.scaleSelected = false;
+                    shape.scaleXSelected = false;
                     shape.translateSelected = false;
                     shape.rotateSelected = false;
                 }
@@ -167,6 +172,7 @@ public class CanvasView extends JPanel implements Observer {
                 lastMouse = null;
 
                 scaling = false;
+                scalingX = false;
                 moving = false;
                 rotating = false;
                 drawing = false;
@@ -208,22 +214,29 @@ public class CanvasView extends JPanel implements Observer {
                 g2.translate(shape.staticCenterPoint.getX(), shape.staticCenterPoint.getY());
                 g2.translate(shape.absX, shape.absY);
                 g2.rotate(shape.radians);
+                g2.scale(shape.absScaleOnX, 1);
                 g2.scale(shape.absScaleX, shape.absScaleY);
                 g2.translate(-shape.staticCenterPoint.getX(), -shape.staticCenterPoint.getY());
 
-                //shape.setBoundingBox();
-                int x = shape.boundingX + shape.boundingWidth;
-                int y = shape.boundingY + shape.boundingHeight;
+                // Draw the scale handle
+                double x = shape.boundingX + shape.boundingWidth;
+                double y = shape.boundingY + shape.boundingHeight;
 
-                //(int)shape.absScaleX,
+                g2.fill(new Rectangle2D.Double(x - shape.getHandleSizeX(), y - shape.getHandleSizeY(),
+                               2*shape.getHandleSizeX(),2*shape.getHandleSizeY()));
+                
+                // Draw the X-axis scale handle
+                x = shape.boundingX + shape.boundingWidth;
+                y = shape.boundingY + shape.boundingHeight/2;
 
-                g2.fillRect((x - shape.getHandleSizeX()), (y - shape.getHandleSizeY()), 2*shape.getHandleSizeX(), 2*shape.getHandleSizeY());
-                // g2.fillRect((x - shape.handleSize), (y - shape.handleSize), 2*shape.handleSize, 2*shape.handleSize);
-                // Draw rotation handles
+                g2.fill(new Rectangle2D.Double(x - shape.getHandleSizeX(), y - shape.getHandleSizeY(),
+                               2*shape.getHandleSizeX(),2*shape.getHandleSizeY()));
+
+                // Draw the rotation handle
                 x = shape.boundingX + (shape.boundingWidth/2);
                 y = shape.boundingY - 10;
-                g2.fillOval((x - shape.getHandleSizeX()), (y - shape.getHandleSizeY()), 2*shape.getHandleSizeX(), 2*shape.getHandleSizeY());
-                // g2.fillOval((x - shape.handleSize), (y - shape.handleSize), 2*shape.handleSize, 2*shape.handleSize);
+                g2.fill(new Ellipse2D.Double(x - shape.getHandleSizeX(), y - shape.getHandleSizeY(),
+                               2*shape.getHandleSizeX(),2*shape.getHandleSizeY()));
 
                 g2.setTransform(save);
             }
@@ -232,7 +245,7 @@ public class CanvasView extends JPanel implements Observer {
     }
 
     private void drawCurrentShape(Graphics2D g2) {
-        if (startMouse == null || scaling || moving || rotating) {
+        if (startMouse == null || scaling || moving || rotating || scalingX) {
             return;
         }
 
