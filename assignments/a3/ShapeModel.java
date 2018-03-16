@@ -14,13 +14,13 @@ public class ShapeModel {
     ShapeType myShapeType;
 
     // Change with transformation
-    Point startPoint; 
-    Point endPoint;
+    Point startPoint=null; 
+    Point endPoint=null;
     Point centerPoint = null;
     // Not changing
-    Point staticCenterPoint;
-    Point staticStartPoint;
-    Point staticEndPoint;
+    Point staticCenterPoint=null;
+    Point staticStartPoint=null;
+    Point staticEndPoint=null;
     // What transformation is the shape doing?
     boolean isSelected = true;
     boolean scaleSelected = false;

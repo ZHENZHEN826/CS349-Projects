@@ -62,14 +62,11 @@ public class DrawingModel extends Observable {
 
     public void rotate(ShapeModel shape, Point lastMouse){
         // transfer the center point of the shape to origin, get the transformed lastMouse Position
-        
-        // System.out.println("centerPoint "+ shape.centerPoint);
-        // System.out.println("lastmouse" + lastMouse);
-        //Point ptDst = shape.transformOnePoint2(lastMouse.x, lastMouse.y);
+
         Point ptDst = new Point(lastMouse.x, lastMouse.y);
         ptDst.translate(-shape.absX, -shape.absY);
         ptDst.translate(-shape.staticCenterPoint.x, -shape.staticCenterPoint.y);
-        // Point ptDst = shape.transformOnePoint(lastMouse.x, lastMouse.y);
+
         // determine degree of rotation
         // System.out.println("ptDst" + ptDst);
         double x = ptDst.getX();
@@ -83,62 +80,36 @@ public class DrawingModel extends Observable {
 
     }
 
-    public void scale(ShapeModel shape, Point startMouse, Point lastMouse){
+    public void scale(ShapeModel shape, Point lastMouse){
         // Point at top left corner
         Point2D topLeft = shape.staticStartPoint;
         Point2D bottomRight = shape.staticEndPoint;
-        // Inverse lastMouse
-        // Point SM = (Point)startMouse;
-        // Point LM = (Point)lastMouse;
         
         Point ptSrc = new Point(lastMouse.x, lastMouse.y);
         Point ptDst = new Point();
-        // Point ptDst = new Point(lastMouse.x, lastMouse.y);
+
         AffineTransform AT1;
         AT1 = new AffineTransform();
         
-        // AT1.translate(shape.centerPoint.getX(), shape.centerPoint.getY());
-
-        
-        AT1.translate(-shape.absX, -shape.absY);
+        AT1.translate(shape.centerPoint.getX(), shape.centerPoint.getY());
         AT1.rotate(-shape.radians);
-        // AT1.translate(-shape.centerPoint.getX(), -shape.centerPoint.getY());
-
+        AT1.translate(-shape.centerPoint.getX(), -shape.centerPoint.getY());
         AT1.transform(ptSrc, ptDst);
-
-        // ptDst.translate(-shape.absX, -shape.absY);
-
-        // Point ptDst = shape.transformOnePoint2(lastMouse.x, lastMouse.y);
-        // Point2D MT = new Point2D.Double(lastMouse.getX(), lastMouse.getY());
-        //rotate topLeft and bottomRight
-
-        // double x = MT.getX();
-        // double y = MT.getY();
-
-        // Mouse position
-        // double x = lastMouse.getX();
-        // double y = lastMouse.getY();
 
         double x = ptDst.getX();
         double y = ptDst.getY();
 
-        // int x = ptDst.x;
-        // int y = ptDst.y;
-
         double oldWidth = bottomRight.getX() - topLeft.getX();
-        double z = topLeft.getX()+bottomRight.getX()-x;
-        double newWidth = x - z;
+        double z1 = topLeft.getX()+bottomRight.getX()-x;
+        double newWidth = x - z1;
 
         double oldHeight = bottomRight.getY() - topLeft.getY();
-        z = topLeft.getY()+bottomRight.getY()-y;
-        // double newHeight = y - topLeft.getY();
-        double newHeight = y - z;
+        double z2 = topLeft.getY()+bottomRight.getY()-y;
+        double newHeight = y - z2;
 
         shape.absScaleX = newWidth/oldWidth;
         shape.absScaleY = newHeight/oldHeight;
 
-
-        // shape.endPoint = (Point)lastMouse;
 
         updateViews();
     }
@@ -185,7 +156,7 @@ public class DrawingModel extends Observable {
         public void undo() throws CannotRedoException {
             super.undo();
             this.shape.radians = p_radian;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: undo rotate to " + shape.radians);
             updateViews();
         }
@@ -193,7 +164,7 @@ public class DrawingModel extends Observable {
         public void redo() throws CannotRedoException {
             super.redo();
             this.shape.radians = n_radian;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: redo rotate to " + shape.radians);
             updateViews();
         }
@@ -232,7 +203,7 @@ public class DrawingModel extends Observable {
             super.undo();
             this.shape.absScaleX = p_scaleX;
             this.shape.absScaleY = p_scaleY;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
@@ -241,7 +212,7 @@ public class DrawingModel extends Observable {
             super.redo();
             this.shape.absScaleX = n_scaleX;
             this.shape.absScaleY = n_scaleY;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
@@ -280,7 +251,7 @@ public class DrawingModel extends Observable {
             super.undo();
             this.shape.absX = p_translateX;
             this.shape.absY = p_translateY;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: undo location to " + shape.absX + "," + shape.absY);
             updateViews();
         }
@@ -289,7 +260,7 @@ public class DrawingModel extends Observable {
             super.redo();
             this.shape.absX = n_translateX;
             this.shape.absY = n_translateY;
-            // this.shape.isSelected = true;
+            this.shape.isSelected = true;
             System.out.println("Model: redo location to " + shape.absX + "," + shape.absY);
             updateViews();
         }
@@ -300,26 +271,47 @@ public class DrawingModel extends Observable {
         for(ShapeModel shape : this.shapes) {
             if (shape.isSelected) {
 
-                int newStartX = shape.staticStartPoint.x + 10;
-                int newStartY = shape.staticStartPoint.y + 10;
+                int newStartX = shape.staticStartPoint.x;// + 10;
+                int newStartY = shape.staticStartPoint.y;// + 10;
                 Point newStartPoint = new Point(newStartX, newStartY);
 
-                int newEndX = shape.staticEndPoint.x + 10;
-                int newEndY = shape.staticEndPoint.y + 10;
+                int newEndX = shape.staticEndPoint.x;// + 10;
+                int newEndY = shape.staticEndPoint.y;// + 10;
                 Point newEndPoint = new Point(newEndX, newEndY);
-
-                //ShapeModel newShape = new ShapeModel(newStartPoint, newEndPoint);
                 
                 ShapeModel newShape = new ShapeModel.ShapeFactory().getShape(shape.myShapeType, newStartPoint, newEndPoint);
-                // newShape.shape = shape.getShape();
-                // newShape.absX += 10;
-                // newShape.absY += 10;
-                // newShape.pX += 10;
-                // newShape.pY += 10;
+
                 this.copyTransformation(newShape, shape);
-                this.addShapeField(newShape, newStartPoint, newEndPoint);
+                // this.addShapeField(newShape, newStartPoint, newEndPoint);
                 shape.isSelected = false;
                 newShape.isSelected = true;
+
+                newShape.absX += 10;
+                newShape.absY += 10;
+
+                newShape.pX += 10;
+                newShape.pY += 10;
+
+                // newShape.startPoint.x += 10;
+                // newShape.startPoint.y += 10;
+
+                // newShape.endPoint.x += 10;
+                // newShape.endPoint.y += 10;
+
+                // newShape.centerPoint.x += 10;
+                // newShape.centerPoint.y += 10;
+
+                // newShape.centerPoint = new Point((newShape.startPoint.x+newShape.endPoint.x)/2, (newShape.startPoint.y + newShape.endPoint.y)/2);
+
+
+                // newShape.staticStartPoint.x += 10;
+                // newShape.staticStartPoint.y += 10;
+                // newShape.staticEndPoint.x += 10;
+                // newShape.staticEndPoint.y += 10;
+                // newShape.staticCenterPoint.x += 10;
+                // newShape.staticCenterPoint.y += 10;
+
+                newShape.setBoundingBox();
 
 
                 UndoableEdit undoableEdit = new AbstractUndoableEdit() {
@@ -329,6 +321,7 @@ public class DrawingModel extends Observable {
                     public void redo() throws CannotRedoException {
                         super.redo();
                         shapes.add(addNewShape);
+                        addNewShape.isSelected = true;
                         // System.out.println("Model: redo value to "+ newShape);
                         updateViews();
                     }
@@ -336,6 +329,9 @@ public class DrawingModel extends Observable {
                     public void undo() throws CannotUndoException {
                         super.undo();
                         shapes.remove(addNewShape);
+                        for(ShapeModel shape : getShapes()) {
+                            shape.isSelected = false;
+                        }
                         // System.out.println("Model: undo value to "+ newShape);
                         updateViews();
                     }
@@ -346,9 +342,6 @@ public class DrawingModel extends Observable {
                 this.shapes.add(newShape);
                 updateViews();
 
-                // this.shapes.add(newShape);
-
-                // updateViews();
                 break;
             }
         } 
@@ -360,6 +353,7 @@ public class DrawingModel extends Observable {
     }
 
     public void copyTransformation (ShapeModel newShape, ShapeModel old){
+        newShape.myShapeType = old.myShapeType;
         newShape.absX = old.absX;
         newShape.absY = old.absY;
         newShape.pX = old.pX;
@@ -372,6 +366,28 @@ public class DrawingModel extends Observable {
 
         newShape.radians = old.radians;
         newShape.pRadians = old.pRadians;
+
+        newShape.startPoint = old.startPoint;
+        // newShape.startPoint.x += 10;
+        // newShape.startPoint.y += 10;
+        newShape.endPoint = old.endPoint;
+        // newShape.endPoint.x += 10;
+        // newShape.endPoint.y += 10;
+        newShape.centerPoint = old.centerPoint;
+        // newShape.centerPoint.x += 10;
+        // newShape.centerPoint.y += 10;
+
+        newShape.staticStartPoint = old.staticStartPoint;
+        newShape.staticEndPoint = old.staticEndPoint;
+        newShape.staticCenterPoint = old.staticCenterPoint;
+
+        newShape.boundingBox = old.boundingBox;
+        newShape.boundingHeight = old.boundingHeight;
+        newShape.boundingWidth = old.boundingWidth;
+        newShape.boundingX = old.boundingX; 
+        newShape.boundingY = old.boundingY;
+
+        newShape.handleSize = old.handleSize;
     }
 
     public void addShapeField(ShapeModel shape, Point startPoint, Point endPoint){
@@ -405,6 +421,7 @@ public class DrawingModel extends Observable {
             public void redo() throws CannotRedoException {
                 super.redo();
                 shapes.add(newShape);
+                newShape.isSelected = true;
                 //value = newValue;
                 // System.out.println("Model: redo value to "+ newShape);
                 updateViews();
@@ -413,6 +430,9 @@ public class DrawingModel extends Observable {
             public void undo() throws CannotUndoException {
                 super.undo();
                 shapes.remove(newShape);
+                for(ShapeModel shape : getShapes()) {
+                    shape.isSelected = false;
+                }
                 //shapes.remove(shapes.size() - 1);
                 //value = oldValue;
                 // System.out.println("Model: undo value to "+ newShape);

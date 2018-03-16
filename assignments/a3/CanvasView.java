@@ -42,10 +42,10 @@ public class CanvasView extends JPanel implements Observer {
                 // After one shape is selected, unselect all the other shapes 
                 boolean setRestUnselected = false;
 
-                System.out.println("Shapes size: " + model.getShapes().size());
+                // System.out.println("Shapes size: " + model.getShapes().size());
                 // Go through the shape list and do hit test
                 for(ShapeModel shape : model.getShapes()) {
-                    System.out.println("mouse click centerPoint1" + shape.centerPoint);
+                    // System.out.println("mouse click centerPoint1" + shape.centerPoint);
                     if (setRestUnselected){
                         shape.isSelected = false;
                     } else if (shape.hitTest(clickPosition)){
@@ -54,7 +54,7 @@ public class CanvasView extends JPanel implements Observer {
                     } else {
                         shape.isSelected = false;
                     }
-                    System.out.println("mouse click centerPoint2" + shape.centerPoint);
+                    // System.out.println("mouse click centerPoint2" + shape.centerPoint);
                 }
                 repaint();
             }
@@ -76,13 +76,13 @@ public class CanvasView extends JPanel implements Observer {
 
                 for(ShapeModel shape : model.getShapes()) {
                     if (shape.onBottomCorner(startMouse.getX(), startMouse.getY()) && shape.isSelected){
-                        System.out.println("On scale handler!");
+                        // System.out.println("On scale handler!");
                         // Scale handle selected
                         shape.scaleSelected = true;
                     } 
                     else if (shape.onRotateHandle(startMouse.getX(), startMouse.getY()) && shape.isSelected){
                         shape.rotateSelected = true;
-                        System.out.println("On rotate handler!");
+                        // System.out.println("On rotate handler!");
                     }
                     else if (shape.hitTest(startMouse) && shape.isSelected) {
                         // To translate - shape must already selected and press inside the shape
@@ -91,7 +91,7 @@ public class CanvasView extends JPanel implements Observer {
                     else {
                         shape.isSelected = false;
                     }
-                    System.out.println("scale: "+ shape.scaleSelected + " translate: "+ shape.translateSelected + " selected: "+ shape.isSelected);
+                    // System.out.println("scale: "+ shape.scaleSelected + " translate: "+ shape.translateSelected + " selected: "+ shape.isSelected);
                 }
                 repaint();
             }
@@ -110,7 +110,7 @@ public class CanvasView extends JPanel implements Observer {
                         scaling = true;
                         drawing = false;
 
-                        model.scale(shape, (Point)startMouse, (Point)lastMouse);
+                        model.scale(shape, (Point)lastMouse);
                         break;
                     } 
                     else if (shape.translateSelected){
@@ -140,19 +140,8 @@ public class CanvasView extends JPanel implements Observer {
             public void mouseReleased(MouseEvent e) {
                 // store transformation info for printing, undoing/redoing
                 super.mouseReleased(e);
-                // if (scaling) {
-
-                // } else if (moving){
-                //     //model.endTranslate();
-                //     //needStore = false;
-                // } else if (rotating) {
-
-                // } else 
+         
                 if (drawing){
-                    // // When draw a new shape, unselect all the other shapes
-                    // for(ShapeModel shape : model.getShapes()) {
-                    //     shape.isSelected = false;
-                    // }
                     // Draw a new shape
                     ShapeModel shape = new ShapeModel.ShapeFactory().getShape(model.getShape(), (Point) startMouse, (Point) lastMouse);
                     
@@ -215,18 +204,12 @@ public class CanvasView extends JPanel implements Observer {
             if (shape.isSelected){
                 // Draw scale handles
                 AffineTransform save = g2.getTransform();
-
                 
                 g2.translate(shape.staticCenterPoint.getX(), shape.staticCenterPoint.getY());
                 g2.translate(shape.absX, shape.absY);
                 g2.rotate(shape.radians);
                 g2.scale(shape.absScaleX, shape.absScaleY);
                 g2.translate(-shape.staticCenterPoint.getX(), -shape.staticCenterPoint.getY());
-                
-                // g2.translate(shape.staticStartPoint.getX(), shape.staticStartPoint.getY());
-                
-                // g2.translate(-shape.staticStartPoint.getX(), -shape.staticStartPoint.getY());
-                // g2.scale(shape.absScaleX, shape.absScaleY);
 
                 //shape.setBoundingBox();
                 int x = shape.boundingX + shape.boundingWidth;
@@ -242,7 +225,6 @@ public class CanvasView extends JPanel implements Observer {
                 g2.fillOval((x - shape.getHandleSizeX()), (y - shape.getHandleSizeY()), 2*shape.getHandleSizeX(), 2*shape.getHandleSizeY());
                 // g2.fillOval((x - shape.handleSize), (y - shape.handleSize), 2*shape.handleSize, 2*shape.handleSize);
 
-                // System.out.println("Draw two dots!");
                 g2.setTransform(save);
             }
 
