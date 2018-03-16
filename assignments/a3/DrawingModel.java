@@ -54,7 +54,7 @@ public class DrawingModel extends Observable {
             // 4th quadrant
             return Math.toRadians(270.0) + Math.atan(Math.abs(y) / Math.abs(x));
         } else {
-            System.out.println("findRadians: what's this case?"+ x + " " + y);
+            // System.out.println("findRadians: what's this case?"+ x + " " + y);
             return 0.0;
         }
     }
@@ -189,7 +189,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: undo rotate to " + shape.radians);
+            // System.out.println("Model: undo rotate to " + shape.radians);
             updateViews();
         }
 
@@ -200,7 +200,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: redo rotate to " + shape.radians);
+            // System.out.println("Model: redo rotate to " + shape.radians);
             updateViews();
         }
 
@@ -242,7 +242,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            // System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
 
@@ -254,7 +254,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            // System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
 
@@ -292,7 +292,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            // System.out.println("Model: undo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
 
@@ -303,7 +303,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
+            // System.out.println("Model: redo scaling to " + shape.absScaleX + "," + shape.absScaleY);
             updateViews();
         }
 
@@ -345,7 +345,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: undo location to " + shape.absX + "," + shape.absY);
+            // System.out.println("Model: undo location to " + shape.absX + "," + shape.absY);
             updateViews();
         }
 
@@ -357,7 +357,7 @@ public class DrawingModel extends Observable {
                 shape.isSelected = false;
             }
             this.shape.isSelected = true;
-            System.out.println("Model: redo location to " + shape.absX + "," + shape.absY);
+            // System.out.println("Model: redo location to " + shape.absX + "," + shape.absY);
             updateViews();
         }
 
@@ -509,6 +509,9 @@ public class DrawingModel extends Observable {
             public void redo() throws CannotRedoException {
                 super.redo();
                 shapes.add(newShape);
+                for(ShapeModel shape : getShapes()) {
+                    shape.isSelected = false;
+                }
                 newShape.isSelected = true;
                 updateViews();
             }
