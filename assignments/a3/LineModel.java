@@ -31,16 +31,4 @@ public class LineModel extends ShapeModel {
         double normalLength = Math.sqrt((B.x-A.x)*(B.x-A.x)+(B.y-A.y)*(B.y-A.y));
         return Math.abs((P.x-A.x)*(B.y-A.y)-(P.y-A.y)*(B.x-A.x))/normalLength;
     }
-
-    @Override
-    public Shape updateShape(Point startPoint, Point endPoint) {
-        this.a = startPoint;
-        this.b = endPoint;
-
-        Path2D path = new Path2D.Double();
-        path.moveTo(startPoint.x, startPoint.y);
-        path.lineTo(endPoint.x, endPoint.y);
-        return path;
-
-    }
 }

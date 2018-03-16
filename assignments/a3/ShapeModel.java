@@ -13,10 +13,15 @@ public class ShapeModel {
     Shape shape;
     ShapeType myShapeType;
 
-    Point startPoint; // Not update when rotate
+    // Change with transformation
+    Point startPoint; 
     Point endPoint;
     Point centerPoint = null;
-
+    // Not changing
+    Point staticCenterPoint;
+    Point staticStartPoint;
+    Point staticEndPoint;
+    // What transformation is the shape doing?
     boolean isSelected = true;
     boolean scaleSelected = false;
     boolean translateSelected = false;
@@ -33,12 +38,13 @@ public class ShapeModel {
     double absScaleX = 1.0;
     double absScaleY = 1.0;
 
-    double pScale = 1.0;
+    double pScaleX = 1.0;
+    double pScaleY = 1.0;
 
     // Rotation variables
-    double radians;
+    double radians = 0.0;
 
-    double pRadians;
+    double pRadians = 0.0;
 
     // Bounding box when shape is created
     Rectangle boundingBox;
@@ -46,13 +52,6 @@ public class ShapeModel {
 
     // Rotation and scaling handles' size
     int handleSize = 5;
-
-    // Point absStartPoint;
-    // Point absEndPoint;
-
-    Point staticCenterPoint;
-    Point staticStartPoint;
-    Point staticEndPoint;
 
     public ShapeModel(Point startPoint, Point endPoint) {}
 
@@ -100,11 +99,12 @@ public class ShapeModel {
         AT1.translate(staticCenterPoint.getX(), staticCenterPoint.getY());
         AT1.translate(absX, absY);
         AT1.rotate(radians);
+        AT1.scale(absScaleX, absScaleY);
         AT1.translate(-staticCenterPoint.getX(), -staticCenterPoint.getY());
 
-        AT1.translate(staticStartPoint.getX(), staticStartPoint.getY());
-        AT1.scale(absScaleX, absScaleY);
-        AT1.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
+        // AT1.translate(staticStartPoint.getX(), staticStartPoint.getY());
+        
+        // AT1.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
 
         // AT1.scale(absScaleX, absScaleY);
         // create an inverse matrix of AT1
@@ -132,14 +132,15 @@ public class ShapeModel {
         AT1 = new AffineTransform();
 
         
-        AT1.translate(staticCenterPoint.getX(), staticCenterPoint.getY());
-        AT1.translate(absX, absY);
+        AT1.translate(centerPoint.getX(), centerPoint.getY());
+        // AT1.translate(absX, absY);
         AT1.rotate(radians);
-        AT1.translate(-staticCenterPoint.getX(), -staticCenterPoint.getY());
-
-        AT1.translate(staticStartPoint.getX(), staticStartPoint.getY());
         AT1.scale(absScaleX, absScaleY);
-        AT1.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
+        AT1.translate(-centerPoint.getX(), -centerPoint.getY());
+
+        // AT1.translate(staticStartPoint.getX(), staticStartPoint.getY());
+        
+        // AT1.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
 
         // AT1.scale(absScaleX, absScaleY);
         // create an inverse matrix of AT1
@@ -189,30 +190,25 @@ public class ShapeModel {
 
         if (staticCenterPoint != null){
             // System.out.println("centerPoint" + staticCenterPoint);
-            // System.out.println("absX " + absX + " absY " + absY);
+            System.out.println("absX " + absX + " absY " + absY);
             System.out.println("Degrees" + Math.toDegrees(radians));
             System.out.println("absScaleX " + absScaleX + " absScaleY " + absScaleY);
+            
 
             t.translate(staticCenterPoint.getX(), staticCenterPoint.getY());
             t.translate(absX, absY);
             t.rotate(radians);
+            t.scale(absScaleX, absScaleY);
             t.translate(-staticCenterPoint.getX(), -staticCenterPoint.getY());
 
-            t.translate(staticStartPoint.getX(), staticStartPoint.getY());
-            t.scale(absScaleX, absScaleY);
-            t.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
+            // t.translate(staticStartPoint.getX(), staticStartPoint.getY());
+            
+            // t.translate(-staticStartPoint.getX(), -staticStartPoint.getY());
         }
 
         return t.createTransformedShape(shape);
         // return shape;
     }
-
-   
-
-    public Shape updateShape(Point startPoint, Point endPoint) {
-        return shape;
-    }
-
 
     /**
      * Given a ShapeType and the start and end point of the shape, ShapeFactory constructs a new ShapeModel

@@ -109,9 +109,8 @@ public class CanvasView extends JPanel implements Observer {
                     if (shape.scaleSelected) {
                         scaling = true;
                         drawing = false;
-                        //shape.updateShape((Point) lastMouse);
-                        //model.updateShape(shape, shape.startPoint ,(Point) lastMouse);
-                        model.scale(shape, startMouse, lastMouse);
+
+                        model.scale(shape, (Point)startMouse, (Point)lastMouse);
                         break;
                     } 
                     else if (shape.translateSelected){
@@ -164,11 +163,11 @@ public class CanvasView extends JPanel implements Observer {
 
                 for(ShapeModel shape : model.getShapes()) {
                     if (shape.scaleSelected){
-
+                        model.endScale(shape);
                     } else if (shape.translateSelected){
                         model.endTranslate(shape);
                     } else if (shape.rotateSelected){
-
+                        model.endRotate(shape);
                     }
                     shape.scaleSelected = false;
                     shape.translateSelected = false;
@@ -221,11 +220,12 @@ public class CanvasView extends JPanel implements Observer {
                 g2.translate(shape.staticCenterPoint.getX(), shape.staticCenterPoint.getY());
                 g2.translate(shape.absX, shape.absY);
                 g2.rotate(shape.radians);
+                g2.scale(shape.absScaleX, shape.absScaleY);
                 g2.translate(-shape.staticCenterPoint.getX(), -shape.staticCenterPoint.getY());
                 
-                g2.translate(shape.staticStartPoint.getX(), shape.staticStartPoint.getY());
-                g2.scale(shape.absScaleX, shape.absScaleY);
-                g2.translate(-shape.staticStartPoint.getX(), -shape.staticStartPoint.getY());
+                // g2.translate(shape.staticStartPoint.getX(), shape.staticStartPoint.getY());
+                
+                // g2.translate(-shape.staticStartPoint.getX(), -shape.staticStartPoint.getY());
                 // g2.scale(shape.absScaleX, shape.absScaleY);
 
                 //shape.setBoundingBox();

@@ -20,12 +20,4 @@ public class RectangleModel extends ShapeModel {
 
         // this.shape = rect;
     }
-
-    @Override
-    public Shape updateShape(Point startPoint, Point endPoint) {
-        Rectangle rect = new java.awt.Rectangle(startPoint);
-        rect.add(endPoint);
-        return new Rectangle2D.Double(rect.x, rect.y, rect.width, rect.height);
-        
-    }
 }
