@@ -68,18 +68,18 @@ public class DrawingModel extends Observable {
     public void rotate(ShapeModel shape, Point lastMouse){
         // transfer the center point of the shape to origin, get the transformed lastMouse Position
         
-        System.out.println("centerPoint "+ shape.centerPoint);
-        System.out.println("lastmouse" + lastMouse);
-
+        // System.out.println("centerPoint "+ shape.centerPoint);
+        // System.out.println("lastmouse" + lastMouse);
+        //Point ptDst = shape.transformOnePoint2(lastMouse.x, lastMouse.y);
         Point ptDst = new Point(lastMouse.x, lastMouse.y);
-        ptDst.translate(-shape.centerPoint.x, -shape.centerPoint.y);
-
+        ptDst.translate(-shape.staticCenterPoint.x, -shape.staticCenterPoint.y);
+        // Point ptDst = shape.transformOnePoint(lastMouse.x, lastMouse.y);
         // determine degree of rotation
-        System.out.println("ptDst" + ptDst);
+        // System.out.println("ptDst" + ptDst);
         double x = ptDst.getX();
         double y = ptDst.getY();
         double radians = findRadians(x, y);
-        System.out.println("Degrees" + Math.toDegrees(radians));
+        // System.out.println("Degrees" + Math.toDegrees(radians));
         // save the degree
         if (x !=0 || y != 0){
             shape.radians = radians;
@@ -87,33 +87,52 @@ public class DrawingModel extends Observable {
 
     }
 
-    public void scale(ShapeModel shape, Point lastMouse){
-        double x = lastMouse.getX();
-        double y = lastMouse.getY();
-
+    public void scale(ShapeModel shape, Point2D startMouse, Point2D lastMouse){
+        
         // Point at top left corner
-        Point topLeft = shape.absStartPoint;
-        Point bottomRight = shape.absEndPoint;
+        Point2D topLeft = shape.staticStartPoint;
+        Point2D bottomRight = shape.staticEndPoint;
+        // Inverse lastMouse
+        Point2D MT = shape.transformOnePoint(lastMouse.getX(), lastMouse.getY());
+        //rotate topLeft and bottomRight
+
+        double x = MT.getX();
+        double y = MT.getY();
+
+        // Mouse position
+        // double x = lastMouse.getX();
+        // double y = lastMouse.getY();
+
         double oldWidth = bottomRight.getX() - topLeft.getX();
         double newWidth = x - topLeft.getX();
 
         double oldHeight = bottomRight.getY() - topLeft.getY();
         double newHeight = y - topLeft.getY();
 
-        shape.absScaleX = oldWidth/newWidth;
-        shape.absScaleX = oldHeight/newHeight;
+        shape.absScaleX = newWidth/oldWidth;
+        shape.absScaleY = newHeight/oldHeight;
+
+        // shape.endPoint = lastMouse;
 
         updateViews();
     }
 
-    public void endScale(ShapeModel shape){
-
+    public void endScale(ShapeModel shape, Point startMouse, Point lastMouse){
+        // shape.startPoint = startMouse;
+        // shape.endPoint = lastMouse;
     }
     public void translate(ShapeModel shape, int dx, int dy){
         shape.absX += dx;
         shape.absY += dy;
-        // shape.centerPoint.x += dx;
-        // shape.centerPoint.y += dy;
+
+        shape.centerPoint.x += dx;
+        shape.centerPoint.y += dy;
+
+        shape.startPoint.x += dx;
+        shape.startPoint.y += dy;
+
+        shape.endPoint.x += dx;
+        shape.endPoint.y += dy;
         updateViews();
     }
 
@@ -122,6 +141,45 @@ public class DrawingModel extends Observable {
         undoManager.addEdit(recUndoable);
         shape.pX = shape.absX;
         shape.pY = shape.absY;
+    }
+
+    public class RectUndoable extends AbstractUndoableEdit{
+        // position for undo
+        public int p_translateX = 0;
+        public int p_translateY = 0;
+
+        // position for redo
+        public int n_translateX = 0;
+        public int n_translateY = 0;
+
+        public ShapeModel shape;
+
+        public RectUndoable(ShapeModel shape, int px, int py, int x, int y){
+            this.shape = shape;
+            // position for undo
+            p_translateX = px;
+            p_translateY = py;
+            // position for redo
+            n_translateX = x;
+            n_translateY = y;
+        }
+
+        public void undo() throws CannotRedoException {
+            super.undo();
+            this.shape.absX = p_translateX;
+            this.shape.absY = p_translateY;
+            System.out.println("Model: undo location to " + shape.absX + "," + shape.absY);
+            updateViews();
+        }
+
+        public void redo() throws CannotRedoException {
+            super.redo();
+            this.shape.absX = n_translateX;
+            this.shape.absY = n_translateY;
+            System.out.println("Model: redo location to " + shape.absX + "," + shape.absY);
+            updateViews();
+        }
+
     }
 
     public void updateShape(ShapeModel shape, Point startPoint, Point endPoint) {
@@ -209,13 +267,23 @@ public class DrawingModel extends Observable {
     }
 
     public void addShapeField(ShapeModel shape, Point startPoint, Point endPoint){
+        // Set shape variables when new shape is drawn
         shape.myShapeType = this.getShape();
+
         shape.startPoint = startPoint;
         shape.endPoint = endPoint;
-
-        shape.absStartPoint = startPoint;
-        shape.absEndPoint = endPoint;
         shape.centerPoint = new Point((startPoint.x+endPoint.x)/2, (startPoint.y + endPoint.y)/2);
+        
+        shape.staticStartPoint = startPoint;
+        shape.staticEndPoint = endPoint;
+        shape.staticCenterPoint = new Point((startPoint.x+endPoint.x)/2, (startPoint.y + endPoint.y)/2);
+
+        shape.absX = 0;
+        shape.absY = 0;
+        shape.pX = 0;
+        shape.pY = 0;
+
+        shape.setBoundingBox();
     }
 
     public void addShape(ShapeModel shape) {
@@ -251,47 +319,7 @@ public class DrawingModel extends Observable {
     }
 
 
-    public class RectUndoable extends AbstractUndoableEdit{
-
-        // position for undo
-        public int p_translateX = 0;
-        public int p_translateY = 0;
-
-        // position for redo
-        public int n_translateX = 0;
-        public int n_translateY = 0;
-
-        public ShapeModel shape;
-
-
-        public RectUndoable(ShapeModel shape, int px, int py, int x, int y){
-            shape = shape;
-            // position for undo
-            p_translateX = px;
-            p_translateY = py;
-            // position for redo
-            n_translateX = x;
-            n_translateY = y;
-        }
-
-
-        public void undo() throws CannotRedoException {
-            super.undo();
-            shape.absX = p_translateX;
-            shape.absY = p_translateY;
-            // System.out.println("Model: undo location to " + absX + "," + absY);
-            updateViews();
-        }
-
-        public void redo() throws CannotRedoException {
-            super.redo();
-            shape.absX = n_translateX;
-            shape.absY = n_translateY;
-            // System.out.println("Model: redo location to " + absX + "," + absY);
-            updateViews();
-        }
-
-    }
+    
 
     public void undo(){
         if(undoManager.canUndo()){

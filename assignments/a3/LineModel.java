@@ -22,7 +22,9 @@ public class LineModel extends ShapeModel {
 
     @Override
     public boolean hitTest(Point2D p) {
-        return pointToLineDistance(a,b,(Point) p) < 10;
+        // Point ptDst = transformOnePoint (p.getX(),  Sp.getY());
+
+        return pointToLineDistance(a,b,(Point)p) < 10;
     }
 
     public double pointToLineDistance(Point A, Point B, Point P) {
