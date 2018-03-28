@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         android:layout_above="@+id/questions"
         android:layout_alignEnd="@+id/questions"
-        android:layout_marginBottom="14dp"
         android:minHeight="45dp"
         android:onClick="onClickLogout"
         android:text="@string/logout" />

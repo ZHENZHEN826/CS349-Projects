@@ -118,13 +118,13 @@ public class Question1  extends AppCompatActivity {
             checkboxView.setText("Brazil");
 
             checkboxView =  (CheckBox)findViewById(R.id.checkBox2);
-            checkboxView.setText("Ivory");
+            checkboxView.setText("Ivory Coast");
 
             checkboxView =  (CheckBox)findViewById(R.id.checkBox3);
-            checkboxView.setText("Coast");
+            checkboxView.setText("Argentina");
 
             checkboxView =  (CheckBox)findViewById(R.id.checkBox4);
-            checkboxView.setText("Slovakia");
+            checkboxView.setText("Luxembourg");
 
             // Restore selected answers
             int box1 = intent.getIntExtra("q2-1", 0);

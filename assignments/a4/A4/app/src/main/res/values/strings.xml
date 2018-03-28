@@ -22,12 +22,54 @@
     <string name="userName">Name: </string>
 
     <string name="questionTitle">Q1: Select the country that has this flag</string>
+    <string name="questionTitle2">Q2: Select the countries that have these flags</string>
+    <string name="questionTitle3">Q3: Select the country that has this flag</string>
+    <string name="questionTitle4">Q4: Select the country that has this flag</string>
+    <string name="questionTitle5">Q5: Select the countries that have these flags</string>
+
 
     <string name="previous">Previous</string>
 
     <string name="result">Your Score: 1/5</string>
 
     <string name="topicSelection">Topic Selection</string>
+
+    <string name="rightAnswer1">Correct Answer: Canada</string>
+    <string name="rightAnswer2">Correct Answer: Brazil, Argentina</string>
+    <string name="rightAnswer3">Correct Answer: China</string>
+    <string name="rightAnswer4">Correct Answer: South Korea</string>
+    <string name="rightAnswer5">Correct Answer: South Africa, United Kingdom</string>
+
+    <!--Question 1 options-->
+    <string name="canada">Canada</string>
+    <string name="taiwan">Taiwan</string>
+    <string name="china">China</string>
+    <string name="peru">Peru</string>
+
+    <!--Question 2 options-->
+    <string name="brazil">Brazil</string>
+    <string name="ivoryCoast">Ivory Coast</string>
+    <string name="argentina">Argentina</string>
+    <string name="luxembourg">Luxembourg</string>
+
+    <!--Question 3 options-->
+    <string name="netherlands">Netherlands</string>
+    <string name="slovakia">Slovakia</string>
+
+    <!--Question 4 options-->
+    <string name="india">India</string>
+    <string name="southKorea">South Korea</string>
+
+    <!--Question 5 options-->
+    <string name="southAfrica">South Africa</string>
+    <string name="unitedKingdom">United Kingdom</string>
+
+
+    <!--Taiwan,China ,Peru-->
+    <!--Brazil,Ivory Coast,Argentina,Luxembourg-->
+    <!--Netherlands,Taiwan,China,Slovakia-->
+    <!--Canada,India,Brazil,South Korea-->
+    <!--Canada,Taiwan,South Africa,United Kingdom,-->
 
 
     <string-array name="number_array">
