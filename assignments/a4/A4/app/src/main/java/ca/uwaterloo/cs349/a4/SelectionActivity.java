@@ -37,9 +37,9 @@ public class SelectionActivity extends AppCompatActivity {
             newString= (String) savedInstanceState.getSerializable("NAME_STRING");
         }
 
+        // Add user's name behind "Welcome"
         TextView welcome = findViewById(R.id.welcome);
         welcome.setText("Welcome " + newString);
-
 
         // set spinner value
         Spinner spinner = findViewById(R.id.number_spinner);
@@ -49,27 +49,25 @@ public class SelectionActivity extends AppCompatActivity {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         spinner.setAdapter(adapter);
-
     }
 
+    // Load first question
     public void onClickLoad(View view) {
         Spinner spinnerView = (Spinner)findViewById(R.id.number_spinner);
         int number = Integer.parseInt(spinnerView.getSelectedItem().toString());
 
-//       if (name != null){
         Intent oldIntent = getIntent();
         String name = oldIntent.getExtras().getString("NAME_STRING");
 
+        // Create new intent with user's name, # of questions, current question(1).
         Intent intent = new Intent(this, Question1.class);
         intent.putExtra("NAME_STRING", name);
         intent.putExtra("totalQuestions", number);
         intent.putExtra("currentQuestion", 1);
         startActivity(intent);
-
-//        }
-
     }
 
+    // Go to welcome page
     public void onClickLogout(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

@@ -18,10 +18,11 @@ public class Result  extends AppCompatActivity {
         setContentView(R.layout.activity_result);
 
         Intent intent = getIntent();
-        // extract the intent value in int
+        // Get values from intent
         int total = intent.getIntExtra("totalQuestions", 0);
         String name = intent.getExtras().getString("NAME_STRING");
 
+        // Answers for Question 1-5
         int q1 = intent.getIntExtra("q1", 0);
         int q3 = intent.getIntExtra("q3", 0);
         int q4 = intent.getIntExtra("q4", 0);
@@ -36,6 +37,12 @@ public class Result  extends AppCompatActivity {
         int q53 = intent.getIntExtra("q5-3", 0);
         int q54 = intent.getIntExtra("q5-4", 0);
 
+//        Log.d("q21", q21 + "");
+//        Log.d("q22", q22 + "");
+//        Log.d("q23", q23 + "");
+//        Log.d("q24", q24 + "");
+
+        // Calculate marks
         int radioMarks = radioScores(q1,q3,q4);
         int q2Marks = q2Score(q21,q22,q23,q24);
         int q5Marks = q5Score(q51,q52,q53,q54);
@@ -50,6 +57,7 @@ public class Result  extends AppCompatActivity {
         result.setText("Your Score: " + totalMarks + "/" + total);
     }
 
+    // Return 1 if answer for question 2 is right
     int q2Score(int q21,int q22, int q23,int q24) {
         if ((q21 ==1) && (q22 == 0) && (q23 == 1) && (q24 == 0)){
             return 1;
@@ -58,6 +66,7 @@ public class Result  extends AppCompatActivity {
         }
     }
 
+    // Return 1 if answer for question 5 is right
     int q5Score(int q51,int q52, int q53,int q54) {
         if ((q51 ==0) && (q52 == 0) && (q53 == 1) && (q54 == 1)){
             return 1;
@@ -66,6 +75,7 @@ public class Result  extends AppCompatActivity {
         }
     }
 
+    // Return score for question1, 3, 4
     int radioScores(int q1,int q3,int q4) {
         int score = 0;
         if (q1 == 1){
@@ -80,6 +90,7 @@ public class Result  extends AppCompatActivity {
         return score;
     }
 
+    // Go back to topic selection page
     public void onClickTopicSelection(View view) {
         Intent intent = getIntent();
         String name = intent.getExtras().getString("NAME_STRING");
@@ -89,6 +100,7 @@ public class Result  extends AppCompatActivity {
         startActivity(newIntent);
     }
 
+    // Go back to welcome page
     public void onClickLogout(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

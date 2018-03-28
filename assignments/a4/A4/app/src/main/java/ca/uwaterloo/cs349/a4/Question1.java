@@ -22,32 +22,29 @@ public class Question1  extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_questions);
 
-        // Get the intent that started this activity
         Intent intent = getIntent();
-        // extract the intent value in int
+        String name = intent.getExtras().getString("NAME_STRING");
         int total = intent.getIntExtra("totalQuestions", 0);
         int current = intent.getIntExtra("currentQuestion", 0);
-        String name = intent.getExtras().getString("NAME_STRING");
 
         // Set user name
         TextView userName = findViewById(R.id.userName3);
         userName.setText("Name: " + name);
 
-        Log.d("myTag", current + "");
+//        Log.d("myTag", current + "");
 
         // If this is the last question, change next button to finish
         if (current == total){
             Button buttonView =  findViewById(R.id.next1);
             buttonView.setText("Finish");
         }
+        // If this is the first question, disable previous button
         if (current == 1){
             Button buttonView =  findViewById(R.id.previous1);
             buttonView.setEnabled(false);
         }
 
-        // For each question, update question title, image, and options
-        TextView title = findViewById(R.id.questionTitle);
-        ImageView image_view = findViewById(R.id.image1);
+        // For question 1, 3, 4, radio buttons are visible, checkboxes are invisible
         if (current == 1 || current ==3 || current == 4){
             CheckBox checkboxView = (CheckBox)findViewById(R.id.checkBox1);
             checkboxView.setVisibility(View.INVISIBLE);
@@ -67,6 +64,7 @@ public class Question1  extends AppCompatActivity {
             radioView = findViewById(R.id.radioAnswer4);
             radioView.setVisibility(View.VISIBLE);
         }
+        // For question 2, 5, radio buttons are invisible, checkboxes are visible
         if (current == 2 || current == 5){
             CheckBox checkboxView = (CheckBox)findViewById(R.id.checkBox1);
             checkboxView.setVisibility(View.VISIBLE);
@@ -86,6 +84,10 @@ public class Question1  extends AppCompatActivity {
             radioView = findViewById(R.id.radioAnswer4);
             radioView.setVisibility(View.INVISIBLE);
         }
+
+        // For each question, update question title, image, and answer options
+        TextView title = findViewById(R.id.questionTitle);
+        ImageView image_view = findViewById(R.id.image1);
         if (current == 1){
             title.setText("Q1: Select the country that has this flag");
             image_view.setImageResource(R.drawable.image1);
@@ -102,6 +104,7 @@ public class Question1  extends AppCompatActivity {
             radioView =  findViewById(R.id.radioAnswer4);
             radioView.setText("Peru");
 
+            // Restore selected answer
             int choice = intent.getIntExtra("q1", 0);
             if (choice != 0){
                 SetRadioChoice(choice);
@@ -123,6 +126,7 @@ public class Question1  extends AppCompatActivity {
             checkboxView =  (CheckBox)findViewById(R.id.checkBox4);
             checkboxView.setText("Slovakia");
 
+            // Restore selected answers
             int box1 = intent.getIntExtra("q2-1", 0);
             int box2 = intent.getIntExtra("q2-2", 0);
             int box3 = intent.getIntExtra("q2-3", 0);
@@ -191,11 +195,13 @@ public class Question1  extends AppCompatActivity {
             SetCheckBoxChoice(box1, box2, box3, box4);
         }
 
+        // Show the current question and total question (ex, 2/4)
         TextView count = findViewById(R.id.questionCount);
         count.setText(current + "/" + total);
 
     }
 
+    // Restore selected checkbox answers
     void SetCheckBoxChoice(int box1, int box2, int box3, int box4){
         CheckBox checkboxView = (CheckBox)findViewById(R.id.checkBox1);
         if (box1 == 1){
@@ -227,6 +233,7 @@ public class Question1  extends AppCompatActivity {
 
     }
 
+    // Restore radio answer
     void SetRadioChoice(int choice){
 
         RadioButton radioView =  findViewById(R.id.radioAnswer1);
@@ -271,7 +278,7 @@ public class Question1  extends AppCompatActivity {
         }
     }
 
-
+    // Go to next question. If this is the last question, go to result page.
     public void onClickNext(View view) {
         Intent intent = getIntent();
         Intent resultIntent = new Intent(this, Result.class);
@@ -280,6 +287,10 @@ public class Question1  extends AppCompatActivity {
         int current = intent.getIntExtra("currentQuestion", 0);
         int total = intent.getIntExtra("totalQuestions", 0);
 
+//        intent = storeRadioAnswer(intent);
+//        intent = storeCheckBoxAnswer(intent);
+
+        // Get radio answer
         RadioGroup radioGroup = findViewById(R.id.radioGroup);
         int radio_id = radioGroup.getCheckedRadioButtonId();
 
@@ -298,95 +309,94 @@ public class Question1  extends AppCompatActivity {
                 choice = 4;
                 break;
         }
+        // Store radio questions' answers
+        if (current == 1){
+            intent.putExtra("q1", choice);
+//            resultIntent.putExtra("q1", choice);
+        } else if (current == 3){
+            intent.putExtra("q3", choice);
+//            resultIntent.putExtra("q3", choice);
+        } else if (current == 4){
+            intent.putExtra("q4", choice);
+//            resultIntent.putExtra("q4", choice);
+        }
 
         // store checkbox answers
-
         if (current == 2) {
             CheckBox box = findViewById(R.id.checkBox1);
             if (box.isChecked()) {
                 intent.putExtra("q2-1", 1);
-                resultIntent.putExtra("q2-1", 1);
+//                resultIntent.putExtra("q2-1", 1);
             } else {
                 intent.putExtra("q2-1", 0);
-                resultIntent.putExtra("q2-1", 0);
+//                resultIntent.putExtra("q2-1", 0);
             }
 
             box = findViewById(R.id.checkBox2);
             if (box.isChecked()) {
                 intent.putExtra("q2-2", 1);
-                resultIntent.putExtra("q2-2", 1);
+//                resultIntent.putExtra("q2-2", 1);
             } else {
                 intent.putExtra("q2-2", 0);
-                resultIntent.putExtra("q2-2", 0);
+//                resultIntent.putExtra("q2-2", 0);
             }
 
             box = findViewById(R.id.checkBox3);
             if (box.isChecked()) {
                 intent.putExtra("q2-3", 1);
-                resultIntent.putExtra("q2-3", 1);
+//                resultIntent.putExtra("q2-3", 1);
             } else {
                 intent.putExtra("q2-3", 0);
-                resultIntent.putExtra("q2-3", 0);
+//                resultIntent.putExtra("q2-3", 0);
             }
 
             box = findViewById(R.id.checkBox4);
             if (box.isChecked()) {
                 intent.putExtra("q2-4", 1);
-                resultIntent.putExtra("q2-4", 1);
+//                resultIntent.putExtra("q2-4", 1);
             } else {
                 intent.putExtra("q2-4", 0);
-                resultIntent.putExtra("q2-4", 0);
+//                resultIntent.putExtra("q2-4", 0);
             }
         }  else if (current == 5){
             CheckBox box = findViewById(R.id.checkBox1);
             if (box.isChecked()) {
                 intent.putExtra("q5-1", 1);
-                resultIntent.putExtra("q5-1", 1);
+//                resultIntent.putExtra("q5-1", 1);
             } else {
                 intent.putExtra("q5-1", 0);
-                resultIntent.putExtra("q5-1", 0);
+//                resultIntent.putExtra("q5-1", 0);
             }
 
             box = findViewById(R.id.checkBox2);
             if (box.isChecked()) {
                 intent.putExtra("q5-2", 1);
-                resultIntent.putExtra("q5-2", 1);
+//                resultIntent.putExtra("q5-2", 1);
             } else {
                 intent.putExtra("q5-2", 0);
-                resultIntent.putExtra("q5-2", 0);
+//                resultIntent.putExtra("q5-2", 0);
             }
 
             box = findViewById(R.id.checkBox3);
             if (box.isChecked()) {
                 intent.putExtra("q5-3", 1);
-                resultIntent.putExtra("q5-3", 1);
+//                resultIntent.putExtra("q5-3", 1);
             }else {
                 intent.putExtra("q5-3", 0);
-                resultIntent.putExtra("q5-3", 0);
+//                resultIntent.putExtra("q5-3", 0);
             }
 
             box = findViewById(R.id.checkBox4);
             if (box.isChecked()) {
                 intent.putExtra("q5-4", 1);
-                resultIntent.putExtra("q5-4", 1);
+//                resultIntent.putExtra("q5-4", 1);
             } else {
                 intent.putExtra("q5-4", 0);
-                resultIntent.putExtra("q5-4", 0);
+//                resultIntent.putExtra("q5-4", 0);
             }
         }
 
-        // Store radio questions' answers
-        if (current == 1){
-            intent.putExtra("q1", choice);
-            resultIntent.putExtra("q1", choice);
-        } else if (current == 3){
-            intent.putExtra("q3", choice);
-            resultIntent.putExtra("q3", choice);
-        } else if (current == 4){
-            intent.putExtra("q4", choice);
-            resultIntent.putExtra("q4", choice);
-        }
-
+        // Go to Next view
         if (current == total){
             // Go to result page
             resultIntent.putExtra("NAME_STRING", name);
@@ -427,16 +437,128 @@ public class Question1  extends AppCompatActivity {
 
     }
 
+    // Go to previous question
     public void onClickPrevious(View view) {
         Intent intent = getIntent();
         int total = intent.getIntExtra("totalQuestions", 0);
         int current = intent.getIntExtra("currentQuestion", 0);
 
         intent.putExtra("currentQuestion", current-1);
+
+        // Get radio answer
+        RadioGroup radioGroup = findViewById(R.id.radioGroup);
+        int radio_id = radioGroup.getCheckedRadioButtonId();
+
+        int choice = 0;
+        switch (radio_id){
+            case R.id.radioAnswer1:
+                choice = 1;
+                break;
+            case R.id.radioAnswer2:
+                choice = 2;
+                break;
+            case R.id.radioAnswer3:
+                choice = 3;
+                break;
+            case R.id.radioAnswer4:
+                choice = 4;
+                break;
+        }
+        // Store radio questions' answers
+        if (current == 1){
+            intent.putExtra("q1", choice);
+//            resultIntent.putExtra("q1", choice);
+        } else if (current == 3){
+            intent.putExtra("q3", choice);
+//            resultIntent.putExtra("q3", choice);
+        } else if (current == 4){
+            intent.putExtra("q4", choice);
+//            resultIntent.putExtra("q4", choice);
+        }
+
+        // store checkbox answers
+        if (current == 2) {
+            CheckBox box = findViewById(R.id.checkBox1);
+            if (box.isChecked()) {
+                intent.putExtra("q2-1", 1);
+//                resultIntent.putExtra("q2-1", 1);
+            } else {
+                intent.putExtra("q2-1", 0);
+//                resultIntent.putExtra("q2-1", 0);
+            }
+
+            box = findViewById(R.id.checkBox2);
+            if (box.isChecked()) {
+                intent.putExtra("q2-2", 1);
+//                resultIntent.putExtra("q2-2", 1);
+            } else {
+                intent.putExtra("q2-2", 0);
+//                resultIntent.putExtra("q2-2", 0);
+            }
+
+            box = findViewById(R.id.checkBox3);
+            if (box.isChecked()) {
+                intent.putExtra("q2-3", 1);
+//                resultIntent.putExtra("q2-3", 1);
+            } else {
+                intent.putExtra("q2-3", 0);
+//                resultIntent.putExtra("q2-3", 0);
+            }
+
+            box = findViewById(R.id.checkBox4);
+            if (box.isChecked()) {
+                intent.putExtra("q2-4", 1);
+//                resultIntent.putExtra("q2-4", 1);
+            } else {
+                intent.putExtra("q2-4", 0);
+//                resultIntent.putExtra("q2-4", 0);
+            }
+        }  else if (current == 5){
+            CheckBox box = findViewById(R.id.checkBox1);
+            if (box.isChecked()) {
+                intent.putExtra("q5-1", 1);
+//                resultIntent.putExtra("q5-1", 1);
+            } else {
+                intent.putExtra("q5-1", 0);
+//                resultIntent.putExtra("q5-1", 0);
+            }
+
+            box = findViewById(R.id.checkBox2);
+            if (box.isChecked()) {
+                intent.putExtra("q5-2", 1);
+//                resultIntent.putExtra("q5-2", 1);
+            } else {
+                intent.putExtra("q5-2", 0);
+//                resultIntent.putExtra("q5-2", 0);
+            }
+
+            box = findViewById(R.id.checkBox3);
+            if (box.isChecked()) {
+                intent.putExtra("q5-3", 1);
+//                resultIntent.putExtra("q5-3", 1);
+            }else {
+                intent.putExtra("q5-3", 0);
+//                resultIntent.putExtra("q5-3", 0);
+            }
+
+            box = findViewById(R.id.checkBox4);
+            if (box.isChecked()) {
+                intent.putExtra("q5-4", 1);
+//                resultIntent.putExtra("q5-4", 1);
+            } else {
+                intent.putExtra("q5-4", 0);
+//                resultIntent.putExtra("q5-4", 0);
+            }
+        }
+
+//        intent = storeRadioAnswer(intent);
+//        intent = storeCheckBoxAnswer(intent);
+
         finish();
         startActivity(intent);
     }
 
+    // Go to welcome page
     public void onClickLogout(View view) {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

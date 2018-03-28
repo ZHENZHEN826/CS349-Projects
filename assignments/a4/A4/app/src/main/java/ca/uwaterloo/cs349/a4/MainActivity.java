@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // For CONFIRM button
+    // Go to questions selection page
     public void onClickNext(View view) {
         EditText nameView = (EditText)findViewById(R.id.name);
         String name = null;
