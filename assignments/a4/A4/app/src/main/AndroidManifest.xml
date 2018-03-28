@@ -29,6 +29,12 @@
 
         </activity>
 
+        <activity android:name=".Result"
+            android:parentActivityName=".Question1"
+            >
+
+        </activity>
+
     </application>
 
 </manifest>

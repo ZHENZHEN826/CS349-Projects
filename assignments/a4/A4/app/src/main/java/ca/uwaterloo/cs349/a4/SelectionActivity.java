@@ -57,13 +57,22 @@ public class SelectionActivity extends AppCompatActivity {
         int number = Integer.parseInt(spinnerView.getSelectedItem().toString());
 
 //       if (name != null){
+        Intent oldIntent = getIntent();
+        String name = oldIntent.getExtras().getString("NAME_STRING");
+
         Intent intent = new Intent(this, Question1.class);
+        intent.putExtra("NAME_STRING", name);
         intent.putExtra("totalQuestions", number);
         intent.putExtra("currentQuestion", 1);
         startActivity(intent);
 
 //        }
 
+    }
+
+    public void onClickLogout(View view) {
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
     }
 
 }

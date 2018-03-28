@@ -25,6 +25,10 @@
 
     <string name="previous">Previous</string>
 
+    <string name="result">Your Score: 1/5</string>
+
+    <string name="topicSelection">Topic Selection</string>
+
 
     <string-array name="number_array">
         <item>1</item>
