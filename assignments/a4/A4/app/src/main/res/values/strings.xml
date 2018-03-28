@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">Quiz App</string>
+
+    <string name="name">Name</string>
+
+    <string name="next">Next</string>
+
+    <string name="copyright">Copyright @jz7li</string>
+
+    <string name="welcome">Welcome</string>
+
+    <string name="topic">Topic</string>
+
+    <string name="questions"># of Questions</string>
+
+    <string name="worldFlag">World Flag</string>
+
+    <string name="logout">Logout</string>
+
+    <string name="load">Load</string>
+
+    <string name="userName">Name: </string>
+
+    <string name="questionTitle">Q1: Select the country that has this flag</string>
+
+    <string name="previous">Previous</string>
+
+
+    <string-array name="number_array">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+</resources>

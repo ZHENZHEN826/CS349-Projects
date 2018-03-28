@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_alignLeft="@+id/questions"
+    android:layout_alignRight="@+id/questions">
+
+    <TextView
+        android:id="@+id/welcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/topic"
+        android:layout_marginTop="34dp"
+        android:minHeight="45dp"
+        android:text="@string/welcome"
+        android:textSize="24sp" />
+
+    <Button
+        android:id="@+id/logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/questions"
+        android:layout_alignTop="@+id/welcome"
+        android:minHeight="45dp"
+        android:text="@string/logout" />
+
+    <TextView
+        android:id="@+id/topic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/welcome"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="166dp"
+        android:minHeight="45dp"
+        android:text="@string/topic"
+        android:textSize="20sp" />
+
+    <TextView
+        android:id="@+id/questions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/topic"
+        android:layout_alignBottom="@+id/topic"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="18dp"
+        android:minHeight="45dp"
+        android:text="@string/questions"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/WorldFlag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/topic"
+        android:layout_below="@+id/topic"
+        android:minHeight="45dp"
+        android:text="@string/worldFlag"
+        android:textSize="20sp" />
+
+    <Spinner
+        android:id="@+id/number_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/WorldFlag"
+        android:layout_alignStart="@+id/questions"
+        android:layout_alignTop="@+id/WorldFlag" />
+
+    <Button
+        android:id="@+id/Load"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/questions"
+        android:layout_below="@+id/number_spinner"
+        android:layout_marginTop="17dp"
+        android:onClick="onClickLoad"
+        android:text="@string/load" />
+
+</RelativeLayout>
